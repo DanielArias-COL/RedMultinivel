@@ -1,0 +1,41 @@
+.buttonh
+{
+-fx-background-color: #2892a7;
+}
+
+/* cambia el color cuando el mouse pas por encima*/
+.buttonh:hover
+{
+-fx-background-color: #7156DD;
+}
+.button:pressed
+{
+-fx-background-color: #F3F3F3;
+}
+
+.colorpanel
+{
+-fx-background-color: #f5f2e6;
+}
+
+.colorpanelcomision
+{
+    -fx-background-color: #bb6116;
+}
+
+.colorpaneladditem
+{
+    -fx-background-color: #5abb16;
+}
+.paleta2
+{
+    -fx-background-color: #2892a7;
+}
+
+.buttoncompra{
+    -fx-background-color: #16a1bb;
+}
+
+.buttoncompra:hover{
+    -fx-background-color: #46a049;
+}
