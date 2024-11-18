@@ -258,5 +258,46 @@ public class MainController {
         }
     }
 
-    
+/////////////////////////////
+@FXML
+private TextField txtAffiliateId;
+
+    // Método para eliminar un afiliado al presionar el botón
+    @FXML
+    public void eliminarAfiliado() {
+        String affiliateId = txtAffiliateId.getText();
+
+        if (affiliateId == null || affiliateId.trim().isEmpty()) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Error", "Debe ingresar un ID válido.");
+            return;
+        }
+
+        try (Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "felipe", "12345");
+             CallableStatement statement = connection.prepareCall("{CALL eliminar_affiliate(?)}")) {
+
+            // Pasar el ID del afiliado como parámetro al procedimiento
+            statement.setInt(1, Integer.parseInt(affiliateId));
+
+            // Ejecutar el procedimiento almacenado
+            statement.execute();
+
+            // Mostrar mensaje de éxito
+            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "El afiliado fue eliminado correctamente.");
+
+        } catch (SQLException e) {
+            // Manejar errores de SQL
+            mostrarAlerta(Alert.AlertType.ERROR, "Error", "Ocurrió un error al intentar eliminar el afiliado: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            // Manejar errores de formato
+            mostrarAlerta(Alert.AlertType.ERROR, "Error", "El ID del afiliado debe ser un número.");
+        }
+    }
+
+    // Método para mostrar alertas en pantalla
+    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
+        Alert alerta = new Alert(tipo);
+        alerta.setTitle(titulo);
+        alerta.setContentText(mensaje);
+        alerta.showAndWait();
+    }
 }

@@ -726,7 +726,29 @@ WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('Error inesperado al insertar el afiliado con ID: ' || p_affiliate_id || '. Código de error: ' || SQLCODE || ' Mensaje: ' || SQLERRM);
 END insertar_affiliate;
 /
+--------ELMINAR AFILIADO---------------------------
 
+CREATE OR REPLACE PROCEDURE eliminar_affiliate (
+    p_affiliate_id IN affiliate.affiliate_id%TYPE
+) IS
+BEGIN
+    -- Intentar eliminar el afiliado con el ID proporcionado
+DELETE FROM affiliate
+WHERE affiliate_id = p_affiliate_id;
 
+-- Comprobar si la eliminación afectó a algún registro
+IF SQL%ROWCOUNT = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Error: El AFFILIATE_ID no existe o ya ha sido eliminado.');
+ELSE
+        DBMS_OUTPUT.PUT_LINE('AFFILIATE_ID eliminado exitosamente.');
+END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error inesperado al intentar eliminar el afiliado.');
+END eliminar_affiliate;
 
+-- Ejemplo de cómo usar el procedimiento para eliminar un afiliado
+BEGIN
+   eliminar_affiliate(5); -- Reemplaza "5" con el ID del afiliado que deseas eliminar
+END;
 
