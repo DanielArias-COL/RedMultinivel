@@ -26,7 +26,7 @@
                   <Insets left="50.0" />
                </padding>
             </Button>
-            <Button fx:id="buttonComision" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#ActivarPanelAgregarEquipo" prefHeight="64.0" prefWidth="278.0" styleClass="buttonh" stylesheets="@../../../../css/fullpackstyling.css" text="  Agregar equipo" textFill="#e8e8e8">
+            <Button fx:id="buttonComisionf" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#ActivarPanelAgregarEquipo" prefHeight="64.0" prefWidth="278.0" styleClass="buttonh" stylesheets="@../../../../css/fullpackstyling.css" text="  Agregar equipo" textFill="#e8e8e8">
                <graphic>
                   <FontAwesomeIcon glyphName="GROUP" />
                </graphic>

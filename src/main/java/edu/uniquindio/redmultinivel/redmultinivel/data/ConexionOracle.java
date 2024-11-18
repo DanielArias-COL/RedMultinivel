@@ -11,9 +11,9 @@ public class ConexionOracle {
 
 
     private static Connection conn;
-    private String url = "jdbc:oracle:thin:@localhost:1521/orcl";
-    private String usuario = "UREDMULTINIVEL";
-    private String password = "UREDMULTINIVEL";
+    private String url = "jdbc:oracle:thin:@localhost:1521/xe";
+    private String usuario = "FELIPE";
+    private String password = "12345";
 
 
 
@@ -26,9 +26,9 @@ public class ConexionOracle {
         OracleDataSource ods = null;
         try {
             ods = new OracleDataSource();
-            ods.setURL("jdbc:oracle:thin:@localhost:1521/orcl"); // jdbc:oracle:thin@//[hostname]:[port]/[DB service name]
-            ods.setUser("UREDMULTINIVEL");
-            ods.setPassword("UREDMULTINIVEL");
+            ods.setURL("jdbc:oracle:thin:@localhost:1521/xe"); // jdbc:oracle:thin@//[hostname]:[port]/[DB service name]
+            ods.setUser("FELIPE");
+            ods.setPassword("12345");
             conn = ods.getConnection();
         } catch (SQLException e) {
             throw new RuntimeException(e);

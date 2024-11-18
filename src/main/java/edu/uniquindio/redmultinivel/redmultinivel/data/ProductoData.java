@@ -13,6 +13,7 @@ public class ProductoData {
 
     public static List<ProductoDto> obtenerProductosDTO()  {
 
+        System.out.println(1);
         List<ProductoDto> productos = new ArrayList<>();
 
         Connection conn = ConexionOracle.getConn();
@@ -29,6 +30,7 @@ public class ProductoData {
                 producto.setName(rslt.getString("NAME"));
                 producto.setValor(rslt.getDouble("SALE_PRICE"));
                 producto.setImagePath(rslt.getString("PATH_IMAGE"));
+                System.out.println(producto.toString());
 
                 // Agrega el producto a la lista
                 productos.add(producto);

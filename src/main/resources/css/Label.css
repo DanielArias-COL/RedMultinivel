@@ -1,0 +1,4 @@
+.label{
+    -fx-font-family: cursive; /* Tipo de letra en cursiva */
+    -fx-text-fill: black; /* Color de texto gris perla */
+}

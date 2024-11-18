@@ -1,0 +1,21 @@
+.button {
+    -fx-min-width: 85px;
+    -fx-max-width: 85px;
+    -fx-min-height: 25px;
+    -fx-max-height: 25px;
+    -fx-background-color: #FFB6C1;
+    -fx-border-color: #FFB6C1;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    -fx-background-color: red;
+}
+
+#anchorPane {
+    -fx-background-color: #FFFACD;
+}
+
+.main-container {
+    -fx-background-color: #00000;
+}
