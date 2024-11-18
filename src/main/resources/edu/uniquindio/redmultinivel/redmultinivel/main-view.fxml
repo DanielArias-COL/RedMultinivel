@@ -103,6 +103,33 @@
          </children>
       </AnchorPane>
       <AnchorPane fx:id="anchorPaneComision" layoutX="217.0" prefHeight="820.0" prefWidth="1009.0" styleClass="colorpanelcomision" stylesheets="@../../../../css/fullpackstyling.css" visible="false" />
-      <AnchorPane fx:id="anchorPaneAgregarEquipo" layoutX="217.0" prefHeight="820.0" prefWidth="1009.0" styleClass="colorpaneladditem" stylesheets="@../../../../css/fullpackstyling.css" visible="false" />
+       <AnchorPane fx:id="anchorPaneAgregarEquipo" layoutX="217.0" prefHeight="820.0" prefWidth="1009.0" styleClass="colorpaneladditem" stylesheets="@../../../../css/fullpackstyling.css" visible="false">
+           <children>
+               <Label layoutX="50.0" layoutY="50.0" text="Agregar Afiliado" styleClass="title-label" />
+
+               <Label layoutX="50.0" layoutY="100.0" text="ID Afiliado:" />
+               <TextField fx:id="textFieldAffiliateId" layoutX="200.0" layoutY="100.0" prefWidth="300.0" />
+
+               <Label layoutX="50.0" layoutY="150.0" text="Nombre:" />
+               <TextField fx:id="textFieldFirstName" layoutX="200.0" layoutY="150.0" prefWidth="300.0" />
+
+               <Label layoutX="50.0" layoutY="200.0" text="Apellido:" />
+               <TextField fx:id="textFieldLastName" layoutX="200.0" layoutY="200.0" prefWidth="300.0" />
+
+               <Label layoutX="50.0" layoutY="250.0" text="Email:" />
+               <TextField fx:id="textFieldEmail" layoutX="200.0" layoutY="250.0" prefWidth="300.0" />
+
+               <Label layoutX="50.0" layoutY="300.0" text="Dirección:" />
+               <TextField fx:id="textFieldAddress" layoutX="200.0" layoutY="300.0" prefWidth="300.0" />
+
+               <Label layoutX="50.0" layoutY="350.0" text="Nivel Jerárquico:" />
+               <TextField fx:id="textFieldHierarchicalLevel" layoutX="200.0" layoutY="350.0" prefWidth="300.0" />
+
+               <Label layoutX="50.0" layoutY="400.0" text="ID Afiliado Padre:" />
+               <TextField fx:id="textFieldParentAffiliateId" layoutX="200.0" layoutY="400.0" prefWidth="300.0" />
+
+               <Button layoutX="200.0" layoutY="450.0" mnemonicParsing="false" text="Guardar" onAction="#onAgregarAfiliado" />
+           </children>
+       </AnchorPane>
    </children>
 </AnchorPane>

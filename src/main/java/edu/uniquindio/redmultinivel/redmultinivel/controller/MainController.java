@@ -2,6 +2,10 @@ package edu.uniquindio.redmultinivel.redmultinivel.controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -14,9 +18,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
@@ -189,4 +191,72 @@ public class MainController {
 
         return ContenedorProducto;
     }
+
+//aqui se crean los afiliados
+
+    @FXML
+    private TextField textFieldAffiliateId;
+
+    @FXML
+    private TextField textFieldFirstName;
+
+    @FXML
+    private TextField textFieldLastName;
+
+    @FXML
+    private TextField textFieldEmail;
+
+    @FXML
+    private TextField textFieldAddress;
+
+    @FXML
+    private TextField textFieldHierarchicalLevel;
+
+    @FXML
+    private TextField textFieldParentAffiliateId;
+
+    @FXML
+    private void onAgregarAfiliado() {
+        // Capturar los valores ingresados
+        String affiliateId = textFieldAffiliateId.getText();
+        String firstName = textFieldFirstName.getText();
+        String lastName = textFieldLastName.getText();
+        String email = textFieldEmail.getText();
+        String address = textFieldAddress.getText();
+        String hierarchicalLevel = textFieldHierarchicalLevel.getText();
+        String parentAffiliateId = textFieldParentAffiliateId.getText();
+
+        // Conexión a la base de datos y ejecución del procedimiento
+        try (Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "felipe", "12345")) {
+            String sql = "{CALL insertar_affiliate(?, ?, ?, ?, ?, ?, ?, ?)}";
+            try (CallableStatement callableStatement = connection.prepareCall(sql)) {
+                callableStatement.setInt(1, Integer.parseInt(affiliateId));
+                callableStatement.setString(2, firstName);
+                callableStatement.setString(3, lastName);
+                callableStatement.setString(4, email);
+                callableStatement.setInt(5, 1); // Activar
+                callableStatement.setString(6, address);
+                callableStatement.setInt(7, Integer.parseInt(hierarchicalLevel));
+                callableStatement.setObject(8, parentAffiliateId.isEmpty() ? null : Integer.parseInt(parentAffiliateId));
+
+                callableStatement.execute();
+
+                // Mostrar mensaje de éxito
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Éxito");
+                alert.setHeaderText(null);
+                alert.setContentText("Afiliado agregado exitosamente.");
+                alert.showAndWait();
+            }
+        } catch (SQLException | NumberFormatException e) {
+            // Mostrar mensaje de error
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("No se pudo agregar el afiliado: " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    
 }

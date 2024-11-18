@@ -680,9 +680,52 @@ SELECT * FROM AFFILIATE;
 
 
 
+--------------PRCEDIMINETO DE CREAR UN AFILIADO------------
+
+
+-- Ejecutar el procedimiento para agregar un afiliado
+BEGIN
+   insertar_affiliate(33, 'Juan', 'Pérez', 'juan.perez@gmail.com', 1, 'CLL22 #11-09', 1, NULL);
+END;
 
 
 
+CREATE OR REPLACE PROCEDURE insertar_affiliate (
+    p_affiliate_id IN affiliate.AFFILIATE_ID%TYPE,
+    p_first_name IN affiliate.FIRST_NAME%TYPE,
+    p_last_name IN affiliate.LAST_NAME%TYPE,
+    p_email IN affiliate.EMAIL%TYPE,
+    p_activate IN affiliate.ACTIVATE%TYPE,
+    p_address IN affiliate.ADRRESS%TYPE,
+    p_hierarchical_level IN affiliate.HIERARCHICAL_LEVEL_ID%TYPE,
+    p_affiliate_affiliate_id IN affiliate.AFFILIATE_PARENT_ID%TYPE
+) IS
+BEGIN
+    -- Validación preliminar
+    IF p_first_name IS NULL OR p_last_name IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20001, 'El nombre y apellido del afiliado son obligatorios.');
+END IF;
+
+    -- Inserción de datos
+INSERT INTO affiliate (
+    AFFILIATE_ID, FIRST_NAME, LAST_NAME, EMAIL, ACTIVATE, ADRRESS, HIERARCHICAL_LEVEL_ID, AFFILIATE_PARENT_ID
+)
+VALUES (
+           p_affiliate_id, p_first_name, p_last_name, p_email, p_activate, p_address, p_hierarchical_level, p_affiliate_affiliate_id
+       );
+
+-- Mensaje de confirmación
+DBMS_OUTPUT.PUT_LINE('El AFFILIATE_ID ' || p_affiliate_id || ' fue insertado exitosamente.');
+
+EXCEPTION
+    WHEN DUP_VAL_ON_INDEX THEN
+        DBMS_OUTPUT.PUT_LINE('Error: El AFFILIATE_ID ' || p_affiliate_id || ' ya existe.');
+WHEN VALUE_ERROR THEN
+        DBMS_OUTPUT.PUT_LINE('Error de tipo de dato o valor fuera de rango para el ID: ' || p_affiliate_id);
+WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error inesperado al insertar el afiliado con ID: ' || p_affiliate_id || '. Código de error: ' || SQLCODE || ' Mensaje: ' || SQLERRM);
+END insertar_affiliate;
+/
 
 
 
