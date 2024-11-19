@@ -48,6 +48,89 @@ Comprar un todo lo de un carrito:
 
 
 
+--Nuevo procedimiento del carrito para agregar
+CREATE OR REPLACE PROCEDURE agregar_producto (
+    codproducto NUMBER,
+    cant NUMBER
+) AS
+    existencia NUMBER;
+    transito NUMBER;
+    yaencarro NUMBER;
+    total NUMBER;
+BEGIN
+    -- Verificar si el producto existe
+    IF (SELECT COUNT(*) FROM PRODUCT WHERE PRODUCT_ID = codproducto) = 0 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Error: el producto no existe');
+END IF;
+
+    -- Obtener la cantidad disponible en el inventario
+SELECT STOCK_QUANTITY INTO existencia
+FROM PRODUCT
+WHERE PRODUCT_ID = codproducto;
+
+-- Obtener la cantidad en tránsito (en carritos activos)
+IF (SELECT COUNT(*) FROM CART_PRODUCT_DETAIL WHERE PRODUCT_ID = codproducto) > 0 THEN
+SELECT SUM(QUANTITY) INTO transito
+FROM CART_PRODUCT_DETAIL
+WHERE PRODUCT_ID = codproducto;
+ELSE
+        transito := 0;
+END IF;
+
+    -- Verificar si hay suficiente inventario disponible
+    IF (existencia - transito < cant) THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Error: No hay suficientes existencias para el producto indicado');
+END IF;
+
+    -- Verificar si el producto ya está en el carrito activo del usuario
+    IF (SELECT COUNT(*)
+        FROM CART c
+                 JOIN CART_PRODUCT_DETAIL d ON c.CART_ID = d.CART_ID
+        WHERE c.ACTIVATE = 1 AND d.PRODUCT_ID = codproducto) > 0 THEN
+SELECT QUANTITY INTO yaencarro
+FROM CART c
+         JOIN CART_PRODUCT_DETAIL d ON c.CART_ID = d.CART_ID
+WHERE c.ACTIVATE = 1 AND d.PRODUCT_ID = codproducto;
+
+-- Eliminar la entrada previa del carrito
+DELETE FROM CART_PRODUCT_DETAIL
+WHERE CART_ID = (SELECT CART_ID FROM CART WHERE ACTIVATE = 1)
+  AND PRODUCT_ID = codproducto;
+ELSE
+        yaencarro := 0;
+END IF;
+
+    -- Calcular la nueva cantidad total
+    total := yaencarro + cant;
+
+    -- Insertar el producto en el carrito activo
+INSERT INTO CART_PRODUCT_DETAIL (
+    CART_PRODUCT_DETAIL_ID,
+    QUANTITY,
+    TOTAL_AMOUNT,
+    CART_ID,
+    PRODUCT_ID
+)
+VALUES (
+           CART_PRODUCT_DETAIL_SEQ.NEXTVAL,
+           total,
+           total * (SELECT SALE_PRICE FROM PRODUCT WHERE PRODUCT_ID = codproducto),
+           (SELECT CART_ID FROM CART WHERE ACTIVATE = 1),
+           codproducto
+       );
+
+-- Mostrar mensaje de confirmación
+DBMS_OUTPUT.PUT_LINE('Procedimiento: Producto agregado al carrito con éxito');
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Error: El producto no existe');
+WHEN OTHERS THEN
+        RAISE_APPLICATION_ERROR(-20003, 'Error desconocido al agregar el producto al carrito');
+END;
+
+
+
 -------------------------------------------------------------------------------------------------------------------------------
 --FUNCIONES
 -------------------------------------------------------------------------------------------------------------------------------
@@ -662,7 +745,7 @@ BEGIN
     END IF;
 
 END;
-/
+
 
 
 
