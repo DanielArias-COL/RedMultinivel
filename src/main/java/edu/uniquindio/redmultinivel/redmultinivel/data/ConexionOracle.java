@@ -44,8 +44,12 @@ public class ConexionOracle {
     }
 
     public static Connection getConn() {
-        if(conn == null){
-            conectar();
+        try {
+            if(conn == null || conn.isClosed()){
+                conectar();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         return conn;
     }

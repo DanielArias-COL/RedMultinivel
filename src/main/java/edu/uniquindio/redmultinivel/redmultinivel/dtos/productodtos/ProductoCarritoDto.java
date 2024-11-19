@@ -14,5 +14,18 @@ public class ProductoCarritoDto {
     Double valor;
 
 
+    public void incrementarCantidad(int n){
+        double valorUnitario = valor/cantidad;
+        cantidad += n;
+        valor = valorUnitario * cantidad;
+    }
+
+    public void decrementarCantidad(int n){
+        double valorUnitario = valor/cantidad;
+        cantidad -= n;
+        valor = valorUnitario * cantidad;
+    }
+
+
 
 }

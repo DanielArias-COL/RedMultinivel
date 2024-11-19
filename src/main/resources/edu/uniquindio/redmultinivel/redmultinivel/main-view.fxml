@@ -82,20 +82,20 @@
               </rowConstraints>
                <children>
                   <Label prefHeight="21.0" prefWidth="106.0" text="Valor original:" />
-                  <TextField editable="false" prefHeight="31.0" prefWidth="90.0" GridPane.columnIndex="1" />
+                  <TextField fx:id="textOriginalValue" editable="false" prefHeight="31.0" prefWidth="90.0" text="0" GridPane.columnIndex="1" />
                   <Label prefHeight="21.0" prefWidth="149.0" text="Valor con descuento:" GridPane.rowIndex="1" />
-                  <TextField editable="false" prefHeight="21.0" prefWidth="106.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="textDescountValue" editable="false" prefHeight="21.0" prefWidth="106.0" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
             </GridPane>
-            <Button layoutX="65.0" layoutY="746.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="257.0" styleClass="buttoncompra" stylesheets="@../../../../css/fullpackstyling.css" text="Comprar" textFill="#ebe8e8" />
-            <Button layoutX="51.0" layoutY="539.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="32.0">
+            <Button layoutX="65.0" layoutY="746.0" mnemonicParsing="false" onAction="#comprarCarrito" prefHeight="39.0" prefWidth="257.0" styleClass="buttoncompra" stylesheets="@../../../../css/fullpackstyling.css" text="Comprar" textFill="#ebe8e8" />
+            <Button layoutX="51.0" layoutY="539.0" mnemonicParsing="false" onAction="#incrementarProductoEnTabla" prefHeight="31.0" prefWidth="32.0">
                <graphic>
                   <FontAwesomeIcon glyphName="PLUS" />
                </graphic>
             </Button>
-            <Button layoutX="129.0" layoutY="540.0" mnemonicParsing="false" text="Eliminar producto" />
-            <Button layoutX="294.0" layoutY="540.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="84.0" text="Vaciar" />
-            <Button layoutX="9.0" layoutY="539.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="32.0">
+            <Button layoutX="129.0" layoutY="540.0" mnemonicParsing="false" onAction="#eliminarProductoSeleccionado" text="Eliminar producto" />
+            <Button layoutX="294.0" layoutY="540.0" mnemonicParsing="false" onAction="#vaciarTabla" prefHeight="31.0" prefWidth="84.0" text="Vaciar" />
+            <Button layoutX="9.0" layoutY="539.0" mnemonicParsing="false" onAction="#decrementarProductoEnTabla" prefHeight="31.0" prefWidth="32.0">
                <graphic>
                   <FontAwesomeIcon glyphName="MINUS" glyphStyle="home" />
                </graphic>

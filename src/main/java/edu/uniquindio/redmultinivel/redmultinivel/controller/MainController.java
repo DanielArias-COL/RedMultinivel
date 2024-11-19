@@ -7,9 +7,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import edu.uniquindio.redmultinivel.redmultinivel.App;
+import edu.uniquindio.redmultinivel.redmultinivel.data.AffiliateData;
 import edu.uniquindio.redmultinivel.redmultinivel.data.ProductoData;
 import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.ProductoCarritoDto;
 import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.ProductoDto;
@@ -28,6 +31,10 @@ public class MainController {
     private ObservableList<ProductoCarritoDto> elementosCarrito = FXCollections.observableArrayList();
 
     private int affiliateId;
+
+    private int PercentageDescount;
+
+    private ProductoCarritoDto productoDtoSeleccionado;
 
     @FXML
     private TextField textFieldAffiliateId;
@@ -50,7 +57,12 @@ public class MainController {
     @FXML
     private TextField textFieldParentAffiliateId;
 
-    private ProductoDto productoDtoSeleccionado;
+    @FXML
+    private TextField textDescountValue;
+
+    @FXML
+    private TextField textOriginalValue;
+
     @FXML
     private TableView<ProductoCarritoDto> tableViewCarrito;
 
@@ -116,20 +128,148 @@ public class MainController {
         anchorPaneAgregarEquipo.setVisible(true);
     }
 
+    @FXML
+    void vaciarTabla(ActionEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Diálogo de confirmación...");
+        alert.setHeaderText(null);
+        alert.setContentText("Esta seguro que desea vaciar la lista");
 
+        Optional<ButtonType> resultado = alert.showAndWait();
+        if (resultado.isPresent())
+        {
+            if (resultado.get() == ButtonType.OK) {
+                tableViewCarrito.getItems().clear();
+            }
+        }
+
+    }
+
+    @FXML
+    void eliminarProductoSeleccionado(ActionEvent event) {
+
+        if (productoDtoSeleccionado != null) {
+            for(int i=0 ; i < elementosCarrito.size() ; i++) {
+                if (Objects.equals(elementosCarrito.get(i).getCodigo(), productoDtoSeleccionado.getCodigo())) {
+                    elementosCarrito.remove(i);
+                    break;
+                }
+            }
+            actualizarValorTotal();
+            refrescarTabla();
+        }else{
+            mostrarDialogoInformacionSEncabezado("Seleccione un producto primero");
+        }
+
+    }
+
+    @FXML
+    void incrementarProductoEnTabla(ActionEvent event) {
+
+        if (productoDtoSeleccionado != null) {
+            for(int i=0 ; i < elementosCarrito.size() ; i++) {
+                if (Objects.equals(elementosCarrito.get(i).getCodigo(), productoDtoSeleccionado.getCodigo())) {
+                    elementosCarrito.get(i).incrementarCantidad(1);
+                    break;
+                }
+            }
+            actualizarValorTotal();
+            refrescarTabla();
+        }else{
+            mostrarDialogoInformacionSEncabezado("Seleccione un producto primero");
+        }
+    }
+
+    @FXML
+    void decrementarProductoEnTabla(ActionEvent event) {
+
+        if (productoDtoSeleccionado != null) {
+            for(int i=0 ; i < elementosCarrito.size() ; i++) {
+                if (Objects.equals(elementosCarrito.get(i).getCodigo(), productoDtoSeleccionado.getCodigo())) {
+                    if (elementosCarrito.get(i).getCantidad()>1){
+                        elementosCarrito.get(i).decrementarCantidad(1);
+                        break;
+                    }
+
+                }
+            }
+            actualizarValorTotal();
+            refrescarTabla();
+        }else{
+            mostrarDialogoInformacionSEncabezado("Seleccione un producto primero");
+        }
+    }
+
+    //Cuadro de diálogo de información sin encabezado
+    public void mostrarDialogoInformacionSEncabezado(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Diálogo de información...");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
 
     @FXML
     public void initialize(App app, int affiliateId) {
         this.affiliateId = affiliateId;
-
+        this.PercentageDescount = AffiliateData.obtenerDescuentoPorId(affiliateId);
         iniciarTablaCarrito();
         cargarproductos();
     }
 
+    /**
+     * Este método nos permite agregar el producto al carrito, si el producto ya se encuentra en el carrito simplemente se actualiza su
+     * cantidad y valor
+     *
+     * @autrhor Daniel Arias
+     * @param codigo
+     * @param nombreProducto
+     * @param cantidad
+     * @param valor
+     */
     public void agregarAlCarrito(Integer codigo, String nombreProducto, Integer cantidad, Double valor) {
 
-        ProductoCarritoDto item = new ProductoCarritoDto(codigo,nombreProducto,cantidad,valor);
-        elementosCarrito.add(item);
+        if(buscarProductoEnCarrito(codigo)){
+            for (int i = 0; i < elementosCarrito.size(); i++) {
+                if(Objects.equals(elementosCarrito.get(i).getCodigo(), codigo)){
+                    elementosCarrito.get(i).setCantidad(cantidad);
+                    elementosCarrito.get(i).setValor(valor);
+                    actualizarValorTotal();
+                    refrescarTabla();
+                    break;
+                }
+            }
+        }else{
+            ProductoCarritoDto item = new ProductoCarritoDto(codigo,nombreProducto,cantidad,valor);
+            elementosCarrito.add(item);
+            actualizarValorTotal();
+        }
+
+    }
+
+    private void actualizarValorTotal() {
+
+        int valor = 0;
+
+        for( ProductoCarritoDto item : elementosCarrito){
+             valor += item.getValor();
+        }
+
+        double valorConDescuento = valor-((valor) * (PercentageDescount/100.0));
+        textOriginalValue.setText(Double.toString(valor));
+        textDescountValue.setText(Double.toString(valorConDescuento));
+
+    }
+
+    private boolean buscarProductoEnCarrito(Integer codigo) {
+
+        for( ProductoCarritoDto item : elementosCarrito){
+            if(Objects.equals(item.getCodigo(), codigo)){
+                return true;
+            }
+        }
+
+        return false;
 
     }
 
@@ -149,10 +289,14 @@ public class MainController {
         tableColumnValor.setCellValueFactory(new PropertyValueFactory<ProductoCarritoDto, Double>("valor"));
 
         tableViewCarrito.getSelectionModel().selectedItemProperty().addListener((obs,oldSelection,newSelection) ->{
-            productoDtoSeleccionado = new ProductoDto();
+            productoDtoSeleccionado = newSelection;
         });
 
         tableViewCarrito.setItems(elementosCarrito);
+    }
+
+    private void refrescarTabla() {
+        tableViewCarrito.refresh();
     }
 
     /**
@@ -188,10 +332,7 @@ public class MainController {
                 gridPaneProductos.add(nodoProducto,j,i);
                 j++;
             }
-
         }
-
-
     }
 
     /**

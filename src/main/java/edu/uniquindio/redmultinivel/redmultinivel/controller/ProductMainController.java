@@ -77,14 +77,21 @@ public class ProductMainController {
 
     @FXML
     void AgregarAlCarrito(ActionEvent event) {
+
         if (cantidad != 0){
             Double valorTotal = producto.getValor()*cantidad;
             mainController.agregarAlCarrito(producto.getCodigo(), producto.getName(), cantidad, valorTotal);
+
+            textCantidad.setText("0");
         }
-
-
     }
 
+    @FXML
+    void comprarCarrito(ActionEvent event) {
+        if (cantidad != 0){
+
+        }
+    }
     public void init(ProductoDto productoDto, MainController mainController){
 
         //Ontenemos el producto para poder trabajar con el en otros métodos
