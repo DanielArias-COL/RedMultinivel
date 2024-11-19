@@ -24,6 +24,7 @@
                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
            </rowConstraints>
             <children>
                <Label text="Cedula:" />
@@ -43,6 +44,8 @@
                  <PasswordField fx:id="contrasenaPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                <Label text="Confirmar Contraseña:" GridPane.rowIndex="6" />
                <PasswordField fx:id="confirmarContrasenaPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+               <TextField fx:id="textFieldParentAffiliateId" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+               <Label text="ID Afiliado Padre:" GridPane.rowIndex="7" />
             </children>
          </GridPane>
       </children>

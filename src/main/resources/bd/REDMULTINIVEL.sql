@@ -695,9 +695,11 @@ CREATE OR REPLACE PROCEDURE insertar_affiliate (
     p_first_name IN affiliate.FIRST_NAME%TYPE,
     p_last_name IN affiliate.LAST_NAME%TYPE,
     p_email IN affiliate.EMAIL%TYPE,
+    p_contrasenia IN affiliate.PASSWORD%TYPE,
     p_activate IN affiliate.ACTIVATE%TYPE,
     p_address IN affiliate.ADRRESS%TYPE,
-    p_hierarchical_level IN affiliate.HIERARCHICAL_LEVEL_ID%TYPE,
+    /*Mirar con trgger*/
+    /*p_hierarchical_level IN affiliate.HIERARCHICAL_LEVEL_ID%TYPE,*/
     p_affiliate_affiliate_id IN affiliate.AFFILIATE_PARENT_ID%TYPE
 ) IS
 BEGIN
@@ -708,10 +710,10 @@ END IF;
 
     -- Inserción de datos
 INSERT INTO affiliate (
-    AFFILIATE_ID, FIRST_NAME, LAST_NAME, EMAIL, ACTIVATE, ADRRESS, HIERARCHICAL_LEVEL_ID, AFFILIATE_PARENT_ID
+    AFFILIATE_ID, FIRST_NAME, LAST_NAME, EMAIL,PASSWORD, ACTIVATE, ADRRESS, AFFILIATE_PARENT_ID
 )
 VALUES (
-           p_affiliate_id, p_first_name, p_last_name, p_email, p_activate, p_address, p_hierarchical_level, p_affiliate_affiliate_id
+           p_affiliate_id, p_first_name, p_last_name, p_email,p_contrasenia, p_activate, p_address, p_affiliate_affiliate_id
        );
 
 -- Mensaje de confirmación
