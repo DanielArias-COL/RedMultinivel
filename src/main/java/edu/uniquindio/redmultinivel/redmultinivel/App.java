@@ -1,5 +1,6 @@
 package edu.uniquindio.redmultinivel.redmultinivel;
 
+import edu.uniquindio.redmultinivel.redmultinivel.controller.LoginViewController;
 import edu.uniquindio.redmultinivel.redmultinivel.controller.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -35,7 +36,8 @@ public class App extends Application {
 
         //Creamos la clase FXMLLoader que nos permite cargar archivos fxml
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(App.class.getResource("main-view.fxml"));
+        //loader.setLocation(App.class.getResource("main-view.fxml"));
+        loader.setLocation(App.class.getResource("loginView.fxml"));
 
         //Ahoraa se lee el archivo previamente cargado y se crea el arbol de nodos y se le asigna a el contenedor
         contenedorRaiz= (AnchorPane)loader.load();
@@ -47,8 +49,8 @@ public class App extends Application {
         primaryStage.setScene(miEscenaRaiz);
 
         //Damos acceso al controlador a la aplicación principal.
-        MainController controller= loader.getController();
-        //LoginViewController controller= loader.getController();
+        //MainController controller= loader.getController();
+        LoginViewController controller= loader.getController();
 
         //Mandamos la clase actual "this" para posteriormente poder cerrarla o esconderla para abrir nuevos
 

@@ -752,3 +752,41 @@ BEGIN
    eliminar_affiliate(5); -- Reemplaza "5" con el ID del afiliado que deseas eliminar
 END;
 
+
+/////login
+
+CREATE OR REPLACE PROCEDURE login_email_affiliate(
+    p_email IN affiliate.EMAIL%TYPE,
+    p_password IN affiliate.PASSWORD%TYPE
+)
+IS
+    v_count NUMBER; -- Variable para verificar si las credenciales coinciden
+BEGIN
+    -- Validar si existe un registro con el email y la contraseña proporcionados
+SELECT COUNT(*)
+INTO v_count
+FROM affiliate
+WHERE email = p_email
+  AND password = p_password;
+
+-- Comprobar si las credenciales son correctas
+IF v_count = 1 THEN
+        DBMS_OUTPUT.PUT_LINE('Inicio de sesión exitoso para el usuario: ' || p_email);
+ELSE
+        DBMS_OUTPUT.PUT_LINE('Error: Credenciales incorrectas.');
+END IF;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error inesperado: ' || SQLERRM);
+END login_email_affiliate;
+
+/////enviar parametros prueba
+
+BEGIN
+    -- Probar con credenciales correctas
+    login_email_affiliate('juan.perez@gmail.com', '123');
+
+END;
+/
+
