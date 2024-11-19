@@ -1,65 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.effect.Bloom?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="335.0" prefWidth="515.0" style="-fx-background-color: 00000;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.uniquindio.redmultinivel.redmultinivel.controller.LoginViewController">
+<AnchorPane prefHeight="335.0" prefWidth="515.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.uniquindio.redmultinivel.redmultinivel.controller.LoginViewController">
    <children>
-      <ImageView fitHeight="65.0" fitWidth="83.0" layoutX="135.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@images/hotel.png" />
-         </image>
-      </ImageView>
-      <Separator layoutX="54.0" layoutY="67.0" prefHeight="9.0" prefWidth="390.0" />
-      <TextField fx:id="txtUsuario_loginView" layoutX="197.0" layoutY="134.0" prefHeight="25.0" prefWidth="226.0" />
-      <Label alignment="CENTER" layoutX="259.0" layoutY="28.0" prefHeight="38.0" prefWidth="138.0" text="LOGIN" textAlignment="CENTER">
+      <!-- Título -->
+      <Label layoutX="200.0" layoutY="28.0" text="LOGIN" textAlignment="CENTER">
          <font>
-            <Font name="Franklin Gothic Book" size="26.0" />
+            <Font name="Franklin Gothic Book" size="26.0"/>
          </font>
       </Label>
-      <PasswordField fx:id="txtContraseña_loginView" layoutX="197.0" layoutY="198.0" prefHeight="25.0" prefWidth="226.0" />
-      <Button fx:id="btnIngresar_loginView" alignment="CENTER" layoutX="120.0" layoutY="238.0" mnemonicParsing="false" onAction="#btnIngresar_loginView" prefHeight="38.0" prefWidth="94.0" style="-fx-background-color: #3b5998;" text="Ingresar" textAlignment="CENTER" textFill="WHITE">
+
+      <!-- Campo de Usuario -->
+      <Label layoutX="75.0" layoutY="100.0" text="Usuario:">
          <font>
-            <Font name="Franklin Gothic Book" size="18.0" />
+            <Font name="Franklin Gothic Book" size="18.0"/>
          </font>
-         <effect>
-            <Bloom threshold="1.0" />
-         </effect>
+      </Label>
+      <TextField fx:id="txtUsuario_loginView" layoutX="197.0" layoutY="100.0" prefHeight="25.0" prefWidth="226.0"/>
+
+      <!-- Campo de Contraseña -->
+      <Label layoutX="75.0" layoutY="160.0" text="Contraseña:">
+         <font>
+            <Font name="Franklin Gothic Book" size="18.0"/>
+         </font>
+      </Label>
+      <PasswordField fx:id="txtContraseña_loginView" layoutX="197.0" layoutY="160.0" prefHeight="25.0" prefWidth="226.0"/>
+
+      <!-- Botón Ingresar -->
+      <Button fx:id="btnIngresar_loginView" layoutX="120.0" layoutY="230.0" text="Ingresar" style="-fx-background-color: #3b5998;" textFill="WHITE" onAction="#btnIngresar_loginView">
+         <font>
+            <Font name="Franklin Gothic Book" size="18.0"/>
+         </font>
       </Button>
-      <Button fx:id="btnCancelar" alignment="CENTER" layoutX="263.0" layoutY="238.0" mnemonicParsing="false" onAction="#btnCancelar_loginView" prefHeight="38.0" prefWidth="94.0" style="-fx-background-color: #3b5998;" text="Cancelar" textFill="WHITE">
+
+      <!-- Botón Cancelar -->
+      <Button fx:id="btnCancelar" layoutX="263.0" layoutY="230.0" text="Cancelar" style="-fx-background-color: #3b5998;" textFill="WHITE" onAction="#btnCancelar_loginView">
          <font>
-            <Font name="Franklin Gothic Book" size="18.0" />
+            <Font name="Franklin Gothic Book" size="18.0"/>
          </font>
       </Button>
-      <Label layoutX="75.0" layoutY="135.0" prefHeight="27.0" prefWidth="73.0" text="Usuario:">
-         <font>
-            <Font name="Franklin Gothic Book" size="18.0" />
-         </font>
-      </Label>
-      <Label layoutX="75.0" layoutY="197.0" prefHeight="27.0" prefWidth="101.0" text="Contraseña:">
-         <font>
-            <Font name="Franklin Gothic Book" size="18.0" />
-         </font>
-      </Label>
-      <ImageView fitHeight="65.0" fitWidth="74.0" layoutX="13.0" layoutY="178.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@images/password.png" />
-         </image>
-      </ImageView>
-      <ImageView fitHeight="38.0" fitWidth="171.0" layoutX="27.0" layoutY="127.0" preserveRatio="true">
-         <image>
-            <Image url="@images/login.jpg" />
-         </image>
-      </ImageView>
-      <Label layoutX="249.0" layoutY="291.0" onMouseClicked="#mostrarVentanaRecuperarContrasenia" prefHeight="18.0" prefWidth="138.0" text="Recuperar contraseña" textFill="#262c71" />
-      <Label layoutX="136.0" layoutY="291.0" onMouseClicked="#mostrarVentanaResgitro" text="Registrarse" textFill="#262c71" />
+
+      <!-- Enlaces para recuperación de contraseña y registro -->
+      <Label layoutX="249.0" layoutY="270.0" text="Recuperar contraseña" textFill="#262c71" onMouseClicked="#mostrarVentanaRecuperarContrasenia"/>
+      <Label layoutX="136.0" layoutY="270.0" text="Registrarse" textFill="#262c71" onMouseClicked="#mostrarVentanaResgitro"/>
    </children>
 </AnchorPane>
