@@ -25,6 +25,8 @@ import javafx.scene.layout.GridPane;
 
 public class MainController {
 
+    public TextField textFieldTelefono;
+    public TextField textFieldContrasenia;
     private ObservableList<ProductoCarritoDto> elementosCarrito = FXCollections.observableArrayList();
 
     private int affiliateId;
@@ -235,6 +237,7 @@ public class MainController {
         String lastName = textFieldLastName.getText();
         String email = textFieldEmail.getText();
         String address = textFieldAddress.getText();
+        String contrasenia = textFieldContrasenia.getText();
         String hierarchicalLevel = textFieldHierarchicalLevel.getText();
         String parentAffiliateId = textFieldParentAffiliateId.getText();
 
@@ -246,10 +249,11 @@ public class MainController {
                 callableStatement.setString(2, firstName);
                 callableStatement.setString(3, lastName);
                 callableStatement.setString(4, email);
-                callableStatement.setInt(5, 1); // Activar
-                callableStatement.setString(6, address);
-                callableStatement.setInt(7, Integer.parseInt(hierarchicalLevel));
-                callableStatement.setObject(8, parentAffiliateId.isEmpty() ? null : Integer.parseInt(parentAffiliateId));
+                callableStatement.setString(5, contrasenia);
+                callableStatement.setInt(6, 1); // Activar
+                callableStatement.setString(7, address);
+                callableStatement.setInt(8, Integer.parseInt(hierarchicalLevel));
+                callableStatement.setObject(9, parentAffiliateId.isEmpty() ? null : Integer.parseInt(parentAffiliateId));
 
                 callableStatement.execute();
 

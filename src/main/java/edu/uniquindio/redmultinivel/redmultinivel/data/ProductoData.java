@@ -13,7 +13,7 @@ public class ProductoData {
 
     public static List<ProductoDto> obtenerProductosDTO()  {
 
-        System.out.println(1);
+
         List<ProductoDto> productos = new ArrayList<>();
 
         Connection conn = ConexionOracle.getConn();
