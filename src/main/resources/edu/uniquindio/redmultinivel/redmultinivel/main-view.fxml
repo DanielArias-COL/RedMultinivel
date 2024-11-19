@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="820.0" prefWidth="1226.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.uniquindio.redmultinivel.redmultinivel.controller.MainController">
+<AnchorPane prefHeight="820.0" prefWidth="1226.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.uniquindio.redmultinivel.redmultinivel.controller.MainController">
    <children>
       <VBox prefHeight="820.0" prefWidth="202.0" style="-fx-background-color: #0799B6;" stylesheets="@../../../../css/fullpackstyling.css">
          <children>
@@ -24,7 +25,7 @@
                   <Insets left="50.0" />
                </padding>
             </Button>
-            <Button fx:id="buttonComisionf" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#ActivarPanelAgregarEquipo" prefHeight="64.0" prefWidth="278.0" styleClass="buttonh" stylesheets="@../../../../css/fullpackstyling.css" text="  Agregar equipo" textFill="#e8e8e8" underline="true">
+            <Button fx:id="buttonComisionf" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#ActivarPanelAgregarEquipo" prefHeight="64.0" prefWidth="278.0" styleClass="buttonh" stylesheets="@../../../../css/fullpackstyling.css" text="Agregar equipo" textFill="#e8e8e8" underline="true">
                <graphic>
                   <FontAwesomeIcon glyphName="GROUP" />
                </graphic>
@@ -35,24 +36,24 @@
          </children>
       </VBox>
       <AnchorPane fx:id="anchorPaneAgregarTienda" layoutX="217.0" layoutY="-1.0" prefHeight="820.0" prefWidth="614.0" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css">
-         <children>
-            <ScrollPane layoutX="-13.0" layoutY="6.0" prefHeight="810.0" prefWidth="625.0" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css" visible="false">
-               <content>
-                  <GridPane fx:id="gridPaneProductos" prefHeight="805.0" prefWidth="616.0" style="-fx-background-color: d2e6ea;" stylesheets="@../../../../css/fullpackstyling.css" visible="false">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="294.0" minWidth="10.0" prefWidth="243.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="354.0" minWidth="10.0" prefWidth="239.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="354.0" minWidth="10.0" prefWidth="239.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                  </GridPane>
-               </content>
-            </ScrollPane>
-         </children>
+          <children>
+              <ScrollPane layoutX="-13.0" layoutY="6.0" prefHeight="810.0" prefWidth="625.0" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css">
+                  <content>
+                      <GridPane fx:id="gridPaneProductos" prefHeight="805.0" prefWidth="616.0" style="-fx-background-color: d2e6ea;" stylesheets="@../../../../css/fullpackstyling.css">
+                          <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="294.0" minWidth="10.0" prefWidth="243.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="354.0" minWidth="10.0" prefWidth="239.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="354.0" minWidth="10.0" prefWidth="239.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                      </GridPane>
+                  </content>
+              </ScrollPane>
+          </children>
       </AnchorPane>
       <AnchorPane fx:id="anchorPaneCarrito" layoutX="839.0" prefHeight="820.0" prefWidth="387.0" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css">
          <children>
@@ -101,7 +102,7 @@
          </children>
       </AnchorPane>
       <AnchorPane fx:id="anchorPaneComision" layoutX="217.0" prefHeight="820.0" prefWidth="1009.0" styleClass="colorpanelcomision" stylesheets="@../../../../css/fullpackstyling.css" visible="false" />
-       <AnchorPane fx:id="anchorPaneAgregarEquipo" layoutX="217.0" prefHeight="820.0" prefWidth="1009.0" styleClass="colorpaneladditem" stylesheets="@../../../../css/fullpackstyling.css">
+       <AnchorPane fx:id="anchorPaneAgregarEquipo" layoutX="217.0" prefHeight="820.0" prefWidth="1009.0" styleClass="colorpaneladditem" stylesheets="@../../../../css/fullpackstyling.css" visible="false">
            <children>
                <!-- Sección de agregar afiliado -->
                <Label layoutX="50.0" layoutY="50.0" styleClass="title-label" text="Agregar Afiliado" />

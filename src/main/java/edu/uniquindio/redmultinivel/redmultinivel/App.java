@@ -7,11 +7,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import lombok.Getter;
 
 import java.io.IOException;
 
 public class App extends Application {
     //Definimos el escenario principal
+    @Getter
     Stage primaryStage;
 
     //Creamos un contenedor raiz para el escenario posterior
@@ -49,12 +51,10 @@ public class App extends Application {
         primaryStage.setScene(miEscenaRaiz);
 
         //Damos acceso al controlador a la aplicación principal.
-        //MainController controller= loader.getController();
         LoginViewController controller= loader.getController();
 
-        //Mandamos la clase actual "this" para posteriormente poder cerrarla o esconderla para abrir nuevos
-
-        controller.initialize(this, 1);
+        //Mandamos la clase actual "this" para posteriormente poder cerrarla o esconderla para abrir nuevos escenatios
+        controller.initialize(this);
 
         primaryStage.show();
     }

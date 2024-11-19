@@ -1,19 +1,16 @@
 package edu.uniquindio.redmultinivel.redmultinivel.data;
 
 import oracle.jdbc.datasource.impl.OracleDataSource;
-
-import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ConexionOracle {
 
 
     private static Connection conn;
-    private static String url = "jdbc:oracle:thin:@localhost:1521/xe";
-    private static String usuario = "felipe";
-    private static String password = "12345";
+    private static String url = "jdbc:oracle:thin:@localhost:1521/orcl";
+    private static String usuario = "UREDMULTINIVEL";
+    private static String password = "UREDMULTINIVEL";
 
 
 

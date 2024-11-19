@@ -1,6 +1,7 @@
 package edu.uniquindio.redmultinivel.redmultinivel.data;
 
 import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.ProductoDto;
+import javafx.scene.control.Alert;
 
 import java.sql.*;
 
@@ -28,10 +29,25 @@ public class AffiliateData {
             salida = cstmt.getInt(1);
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error al obtener El Descuento del empleado",e);
+
         }
 
         return salida;
+    }
+
+    public static void validarCredenciales(String email, String password) {
+
+        try (Connection connection = ConexionOracle.getConn()) {
+            String sql = "{CALL login_email_affiliate(?, ?)}";
+            try (CallableStatement statement = connection.prepareCall(sql)) {
+                statement.setString(1, email);
+                statement.setString(2, password);
+                statement.execute();
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al obtener El Descuento del empleado",e);
+        }
     }
 
 }

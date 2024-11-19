@@ -202,6 +202,11 @@ public class MainController {
         }
     }
 
+    @FXML
+    void comprarCarrito(ActionEvent event) {
+
+    }
+
     //Cuadro de diálogo de información sin encabezado
     public void mostrarDialogoInformacionSEncabezado(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -212,7 +217,7 @@ public class MainController {
     }
 
     @FXML
-    public void initialize(App app, int affiliateId) {
+    public void initialize( int affiliateId) {
         this.affiliateId = affiliateId;
         this.PercentageDescount = AffiliateData.obtenerDescuentoPorId(affiliateId);
         iniciarTablaCarrito();
