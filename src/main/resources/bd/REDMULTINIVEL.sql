@@ -42,10 +42,65 @@ Comprar un todo lo de un carrito:
 - Se debe de crear la venta 
 - se agrega el carrito y se asigna el estado de la venta
 - se crea un envio y segun el estado de la venta se cambia el estado del envio
-*/ 
-    
---
+*/
+--Actualizar total carrito
+CREATE OR REPLACE TRIGGER trg_update_cart_total
+AFTER INSERT OR UPDATE OR DELETE ON CART_PRODUCT_DETAIL
+    FOR EACH ROW
+DECLARE
+v_total NUMBER;
+BEGIN
+    -- Calcular el nuevo total del carrito
+SELECT COALESCE(SUM(TOTAL_AMOUNT), 0)
+INTO v_total
+FROM CART_PRODUCT_DETAIL
+WHERE CART_ID = :NEW.CART_ID;
 
+-- Actualizar el total en la tabla CART
+UPDATE CART
+SET TOTAL = v_total
+WHERE CART_ID = :NEW.CART_ID;
+END;
+/
+
+---Trigger para desactivar carrito
+CREATE OR REPLACE TRIGGER trg_deactivate_cart_on_sale
+AFTER INSERT ON SALE
+FOR EACH ROW
+BEGIN
+    -- Desactivar el carrito asociado a la venta
+UPDATE CART
+SET ACTIVATE = 0
+WHERE CART_ID = :NEW.CART_ID;
+END;
+
+--
+---Calular nivel jerarquico del afiliado
+CREATE OR REPLACE TRIGGER trg_update_hierarchical_level
+AFTER INSERT ON AFFILIATE
+FOR EACH ROW
+DECLARE
+v_num_children NUMBER;
+    v_new_level_id NUMBER;
+BEGIN
+    -- Contar el número de hijos del afiliado padre
+SELECT COUNT(*)
+INTO v_num_children
+FROM AFFILIATE
+WHERE AFFILIATE_PARENT_ID = :NEW.AFFILIATE_PARENT_ID;
+
+-- Obtener el nivel jerárquico más alto alcanzable según el número de hijos
+SELECT MAX(HIERARCHICAL_LEVEL_ID)
+INTO v_new_level_id
+FROM HIERARCHICAL_LEVEL
+WHERE AFFILIATE_REQUIREMENT <= v_num_children;
+
+-- Actualizar el nivel jerárquico del afiliado padre
+UPDATE AFFILIATE
+SET HIERARCHICAL_LEVEL_ID = v_new_level_id
+WHERE AFFILIATE_ID = :NEW.AFFILIATE_PARENT_ID;
+END;
+/
 
 
 --Nuevo procedimiento del carrito para agregar
