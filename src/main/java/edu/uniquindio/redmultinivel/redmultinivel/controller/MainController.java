@@ -27,7 +27,30 @@ public class MainController {
 
     private ObservableList<ProductoCarritoDto> elementosCarrito = FXCollections.observableArrayList();
 
+    private int affiliateId;
 
+    @FXML
+    private TextField textFieldAffiliateId;
+
+    @FXML
+    private TextField textFieldFirstName;
+
+    @FXML
+    private TextField textFieldLastName;
+
+    @FXML
+    private TextField textFieldEmail;
+
+    @FXML
+    private TextField textFieldAddress;
+
+    @FXML
+    private TextField textFieldHierarchicalLevel;
+
+    @FXML
+    private TextField textFieldParentAffiliateId;
+
+    private ProductoDto productoDtoSeleccionado;
     @FXML
     private TableView<ProductoCarritoDto> tableViewCarrito;
 
@@ -44,17 +67,11 @@ public class MainController {
     @FXML
     private TableColumn<ProductoCarritoDto, Double> tableColumnValor;
 
-
-
-
     @FXML
     private ResourceBundle resources;
 
     @FXML
     private GridPane gridPaneProductos;
-
-    @FXML
-    private URL location;
 
     @FXML
     private AnchorPane anchorPaneAgregarTienda;
@@ -102,13 +119,11 @@ public class MainController {
 
 
     @FXML
-    void initialize() {
-        assert anchorPaneAgregarTienda != null : "fx:id=\"anchorPaneAgregarTienda\" was not injected: check your FXML file 'main-view.fxml'.";
-        assert buttonTienda != null : "fx:id=\"buttonTienda\" was not injected: check your FXML file 'main-view.fxml'.";
-        assert buttonComision != null : "fx:id=\"buttonComision\" was not injected: check your FXML file 'main-view.fxml'.";
-        assert anchorPaneComision != null : "fx:id=\"anchorPaneComision\" was not injected: check your FXML file 'main-view.fxml'.";
-        assert anchorPaneAgregarEquipo != null : "fx:id=\"anchorPaneAgregarEquipo\" was not injected: check your FXML file 'main-view.fxml'.";
+    public void initialize(App app, int affiliateId) {
+        this.affiliateId = affiliateId;
 
+        iniciarTablaCarrito();
+        cargarproductos();
     }
 
     public void agregarAlCarrito(Integer codigo, String nombreProducto, Integer cantidad, Double valor) {
@@ -117,8 +132,15 @@ public class MainController {
         elementosCarrito.add(item);
 
     }
-    public void init(App app) {
 
+
+    /**
+     * Este método nos permite inicializar todas las tabla al carrito, ademas le da la funcionalidad de
+     * selección
+     *
+     * @author Daniel Arias
+     */
+    private void iniciarTablaCarrito() {
         //los nombres que se le dan como codigo,fechaInicio tienen que estar igual a como aparecen en el paquete util
         //se vincula elementos del objetos con cada una de las columnas de la tabla
         tableColumnCodigo.setCellValueFactory(new PropertyValueFactory<ProductoCarritoDto, Integer>("codigo"));
@@ -126,19 +148,23 @@ public class MainController {
         tableColumnCantidad.setCellValueFactory(new PropertyValueFactory<ProductoCarritoDto, Integer>("cantidad"));
         tableColumnValor.setCellValueFactory(new PropertyValueFactory<ProductoCarritoDto, Double>("valor"));
 
+        tableViewCarrito.getSelectionModel().selectedItemProperty().addListener((obs,oldSelection,newSelection) ->{
+            productoDtoSeleccionado = new ProductoDto();
+        });
+
         tableViewCarrito.setItems(elementosCarrito);
-
-
-        cargarproductos();
     }
 
+    /**
+     *Este método realiza la consulta a la base de datos y carga los productos
+     *disponibles en el gridPane
+     *
+     * @author Daniel Arias
+     */
     public void cargarproductos(){
-
 
         List<ProductoDto> productos = ProductoData.obtenerProductosDTO();
 
-
-        //calcular la cantidad de filas necesarias
         int cantidadProductos = productos.size();
         int filas = 3;
         int columnas =3;
@@ -168,6 +194,14 @@ public class MainController {
 
     }
 
+    /**
+     *Este método nos permite la creación de una instancia del anchor pane que
+     * contiene cada producto individual
+     *
+     * @author Daniel Arias
+     * @param productoDto
+     * @return
+     */
     private AnchorPane crearNodoProducto(ProductoDto productoDto) {
         AnchorPane ContenedorProducto = null;
 
@@ -192,28 +226,6 @@ public class MainController {
         return ContenedorProducto;
     }
 
-//aqui se crean los afiliados
-
-    @FXML
-    private TextField textFieldAffiliateId;
-
-    @FXML
-    private TextField textFieldFirstName;
-
-    @FXML
-    private TextField textFieldLastName;
-
-    @FXML
-    private TextField textFieldEmail;
-
-    @FXML
-    private TextField textFieldAddress;
-
-    @FXML
-    private TextField textFieldHierarchicalLevel;
-
-    @FXML
-    private TextField textFieldParentAffiliateId;
 
     @FXML
     private void onAgregarAfiliado() {

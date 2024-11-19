@@ -50,8 +50,9 @@ public class App extends Application {
         MainController controller= loader.getController();
         //LoginViewController controller= loader.getController();
 
-        //Mandamos la clase actual "this" para posteriormente poder cerrarla o esconderla para abrir nuevos componentes
-        controller.init(this);
+        //Mandamos la clase actual "this" para posteriormente poder cerrarla o esconderla para abrir nuevos
+
+        controller.initialize(this, 1);
 
         primaryStage.show();
     }
