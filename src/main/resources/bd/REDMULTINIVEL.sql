@@ -785,7 +785,7 @@ END login_email_affiliate;
 
 BEGIN
     -- Probar con credenciales correctas
-    login_email_affiliate('juan.perez@gmail.com', '123');
+    login_email_affiliate('juan.perez@gmail.com', 'juan.perez');
 
 END;
 /
