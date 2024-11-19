@@ -11,9 +11,9 @@ public class ConexionOracle {
 
 
     private static Connection conn;
-    private static String url = "jdbc:oracle:thin:@localhost:1521/orcl";
-    private static String usuario = "UREDMULTINIVEL";
-    private static String password = "UREDMULTINIVEL";
+    private static String url = "jdbc:oracle:thin:@localhost:1521/xe";
+    private static String usuario = "felipe";
+    private static String password = "12345";
 
 
 

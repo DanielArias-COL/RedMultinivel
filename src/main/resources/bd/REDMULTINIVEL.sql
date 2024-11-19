@@ -48,6 +48,89 @@ Comprar un todo lo de un carrito:
 
 
 
+--Nuevo procedimiento del carrito para agregar
+CREATE OR REPLACE PROCEDURE agregar_producto (
+    codproducto NUMBER,
+    cant NUMBER
+) AS
+    existencia NUMBER;
+    transito NUMBER;
+    yaencarro NUMBER;
+    total NUMBER;
+BEGIN
+    -- Verificar si el producto existe
+    IF (SELECT COUNT(*) FROM PRODUCT WHERE PRODUCT_ID = codproducto) = 0 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Error: el producto no existe');
+END IF;
+
+    -- Obtener la cantidad disponible en el inventario
+SELECT STOCK_QUANTITY INTO existencia
+FROM PRODUCT
+WHERE PRODUCT_ID = codproducto;
+
+-- Obtener la cantidad en tránsito (en carritos activos)
+IF (SELECT COUNT(*) FROM CART_PRODUCT_DETAIL WHERE PRODUCT_ID = codproducto) > 0 THEN
+SELECT SUM(QUANTITY) INTO transito
+FROM CART_PRODUCT_DETAIL
+WHERE PRODUCT_ID = codproducto;
+ELSE
+        transito := 0;
+END IF;
+
+    -- Verificar si hay suficiente inventario disponible
+    IF (existencia - transito < cant) THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Error: No hay suficientes existencias para el producto indicado');
+END IF;
+
+    -- Verificar si el producto ya está en el carrito activo del usuario
+    IF (SELECT COUNT(*)
+        FROM CART c
+                 JOIN CART_PRODUCT_DETAIL d ON c.CART_ID = d.CART_ID
+        WHERE c.ACTIVATE = 1 AND d.PRODUCT_ID = codproducto) > 0 THEN
+SELECT QUANTITY INTO yaencarro
+FROM CART c
+         JOIN CART_PRODUCT_DETAIL d ON c.CART_ID = d.CART_ID
+WHERE c.ACTIVATE = 1 AND d.PRODUCT_ID = codproducto;
+
+-- Eliminar la entrada previa del carrito
+DELETE FROM CART_PRODUCT_DETAIL
+WHERE CART_ID = (SELECT CART_ID FROM CART WHERE ACTIVATE = 1)
+  AND PRODUCT_ID = codproducto;
+ELSE
+        yaencarro := 0;
+END IF;
+
+    -- Calcular la nueva cantidad total
+    total := yaencarro + cant;
+
+    -- Insertar el producto en el carrito activo
+INSERT INTO CART_PRODUCT_DETAIL (
+    CART_PRODUCT_DETAIL_ID,
+    QUANTITY,
+    TOTAL_AMOUNT,
+    CART_ID,
+    PRODUCT_ID
+)
+VALUES (
+           CART_PRODUCT_DETAIL_SEQ.NEXTVAL,
+           total,
+           total * (SELECT SALE_PRICE FROM PRODUCT WHERE PRODUCT_ID = codproducto),
+           (SELECT CART_ID FROM CART WHERE ACTIVATE = 1),
+           codproducto
+       );
+
+-- Mostrar mensaje de confirmación
+DBMS_OUTPUT.PUT_LINE('Procedimiento: Producto agregado al carrito con éxito');
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Error: El producto no existe');
+WHEN OTHERS THEN
+        RAISE_APPLICATION_ERROR(-20003, 'Error desconocido al agregar el producto al carrito');
+END;
+
+
+
 -------------------------------------------------------------------------------------------------------------------------------
 --FUNCIONES
 -------------------------------------------------------------------------------------------------------------------------------
@@ -662,7 +745,7 @@ BEGIN
     END IF;
 
 END;
-/
+
 
 
 
@@ -695,9 +778,11 @@ CREATE OR REPLACE PROCEDURE insertar_affiliate (
     p_first_name IN affiliate.FIRST_NAME%TYPE,
     p_last_name IN affiliate.LAST_NAME%TYPE,
     p_email IN affiliate.EMAIL%TYPE,
+    p_contrasenia IN affiliate.PASSWORD%TYPE,
     p_activate IN affiliate.ACTIVATE%TYPE,
     p_address IN affiliate.ADRRESS%TYPE,
-    p_hierarchical_level IN affiliate.HIERARCHICAL_LEVEL_ID%TYPE,
+    /*Mirar con trgger*/
+    /*p_hierarchical_level IN affiliate.HIERARCHICAL_LEVEL_ID%TYPE,*/
     p_affiliate_affiliate_id IN affiliate.AFFILIATE_PARENT_ID%TYPE
 ) IS
 BEGIN
@@ -708,10 +793,10 @@ END IF;
 
     -- Inserción de datos
 INSERT INTO affiliate (
-    AFFILIATE_ID, FIRST_NAME, LAST_NAME, EMAIL, ACTIVATE, ADRRESS, HIERARCHICAL_LEVEL_ID, AFFILIATE_PARENT_ID
+    AFFILIATE_ID, FIRST_NAME, LAST_NAME, EMAIL,PASSWORD, ACTIVATE, ADRRESS, AFFILIATE_PARENT_ID
 )
 VALUES (
-           p_affiliate_id, p_first_name, p_last_name, p_email, p_activate, p_address, p_hierarchical_level, p_affiliate_affiliate_id
+           p_affiliate_id, p_first_name, p_last_name, p_email,p_contrasenia, p_activate, p_address, p_affiliate_affiliate_id
        );
 
 -- Mensaje de confirmación
@@ -751,4 +836,42 @@ END eliminar_affiliate;
 BEGIN
    eliminar_affiliate(5); -- Reemplaza "5" con el ID del afiliado que deseas eliminar
 END;
+
+
+/////login
+
+CREATE OR REPLACE PROCEDURE login_email_affiliate(
+    p_email IN affiliate.EMAIL%TYPE,
+    p_password IN affiliate.PASSWORD%TYPE
+)
+IS
+    v_count NUMBER; -- Variable para verificar si las credenciales coinciden
+BEGIN
+    -- Validar si existe un registro con el email y la contraseña proporcionados
+SELECT COUNT(*)
+INTO v_count
+FROM affiliate
+WHERE email = p_email
+  AND password = p_password;
+
+-- Comprobar si las credenciales son correctas
+IF v_count = 1 THEN
+        DBMS_OUTPUT.PUT_LINE('Inicio de sesión exitoso para el usuario: ' || p_email);
+ELSE
+        DBMS_OUTPUT.PUT_LINE('Error: Credenciales incorrectas.');
+END IF;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error inesperado: ' || SQLERRM);
+END login_email_affiliate;
+
+/////enviar parametros prueba
+
+BEGIN
+    -- Probar con credenciales correctas
+    login_email_affiliate('juan.perez@gmail.com', 'juan.perez');
+
+END;
+/
 
