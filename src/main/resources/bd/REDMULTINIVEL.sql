@@ -326,9 +326,19 @@ BEGIN
     FROM CART_PRODUCT_DETAIL 
     WHERE CART_ID = CARTID
     GROUP BY CART_ID;
-    
+ 
     RETURN V_CONTADOR;
 END;
+
+--Test
+--Parametro1 :CARTID
+
+begin
+DBMS_OUTPUT.PUT_LINE(F_CALCULAR_TOTAL_CARRITO(81));
+end;
+
+select * from cart;
+
 
 --Funcion para verificar si un carrito ya contiene un producto
 CREATE OR REPLACE FUNCTION F_BUSCAR_PRODUCTO_EN_CARRITO (PRODUCID IN NUMBER, CARTID NUMBER)
@@ -429,7 +439,226 @@ BEGIN
    DBMS_OUTPUT.PUT_LINE(COMISIONES_TOTALES_PARA_VENTA(5)); 
 END;
 
+
+CREATE OR REPLACE FUNCTION F_AGREGAR_AL_CARRITO(
+AFFILIATE_ID IN NUMBER,
+PRODUCT_ID IN NUMBER,
+QUANTITY IN NUMBER
+)
+RETURN NUMBER
+IS    
+    V_CID NUMBER;
+    V_PID NUMBER := PRODUCT_ID;
+    V_PPRECIO NUMBER;
+    V_AFFID NUMBER := AFFILIATE_ID;
+    V_FLAG NUMBER;
+    V_FLAG_PRODUCTO NUMBER;
+    V_PPDID NUMBER := CART_PRODUCT_DETAIL_SEQ.NEXTVAL;
+    
+BEGIN
+    --Se obtiene el precio de venta del producto para el calculo de los totales
+    SELECT SALE_PRICE 
+    INTO V_PPRECIO 
+    FROM PRODUCT 
+    WHERE PRODUCT_ID = V_PID;
+    
+    -- Validamos que hay carritos de compra activos para el usuario, de otra forma creamos uno
+    SELECT COUNT(*)
+    INTO V_FLAG
+    FROM CART
+    WHERE AFFILIATE_ID = V_AFFID AND ACTIVATE = 1 ;
+    
+    IF V_FLAG = 0 THEN 
+        V_CID := CART_SEQ.NEXTVAL;  --Trabajamos con el nuevo id del nuevo carrito
+        INSERT INTO CART (
+            CART_ID,
+            TOTAL,
+            ACTIVATE,
+            AFFILIATE_ID
+        ) 
+        VALUES(
+            V_CID,
+            0, 
+            1, --- Se activa el carrito
+            V_AFFID
+        );
+        
+        --Debido a que es un carrito nuevo podemos agregar el primer producto sin inconvenientes
+        INSERT INTO CART_PRODUCT_DETAIL(
+            CART_PRODUCT_DETAIL_ID,
+            QUANTITY,
+            TOTAL_AMOUNT,
+            CART_ID,
+            PRODUCT_ID
+        )
+        VALUES (
+            CART_SEQ.NEXTVAL,
+            QUANTITY,
+            V_PPRECIO*QUANTITY,
+            V_CID,
+            V_PID 
+        );
+    ELSE
+        --Identidicamos cual es el carrito activo del cliente y lo asignamos a V_CID
+        SELECT CART_ID 
+        INTO V_CID 
+        FROM CART
+        WHERE ACTIVATE = 1 AND AFFILIATE_ID = V_AFFID;
+
+        --Buscamos si en el carrito ya se encuentra añadido el mismo producto, con el fin de actualizar sus valores y no pegar otro registro
+        V_FLAG_PRODUCTO := F_BUSCAR_PRODUCTO_EN_CARRITO(V_PID, V_CID);
+        
+        IF V_FLAG_PRODUCTO > 0 THEN
+
+            INCREMENTAR_PRODUCTOS_EN_CARRITO(V_CID, V_PID, QUANTITY);
+            
+        ELSE
+            --De lo contrario añadimos un nuevo producto
+            INSERT INTO CART_PRODUCT_DETAIL(
+                CART_PRODUCT_DETAIL_ID,
+                QUANTITY,
+                TOTAL_AMOUNT,
+                CART_ID,
+                PRODUCT_ID
+            )
+            VALUES (
+                V_PPDID,
+                QUANTITY,
+                V_PPRECIO*QUANTITY,
+                V_CID,
+                V_PID 
+            );
+        END IF;
+        
+    END IF;
+    --Se actualiza el precio total de lo que va en el carrito
+    ACTUALIZAR_TOTAL_CARRITO(V_CID);
+    
+    RETURN V_PPDID;
+    
+END;
+
+--Test
+--PARAMETRO 1: AFFILIATE_ID
+--PARAMETRO 2: PRODUCT_ID
+--PARAMETRO 3: QUANTITY
+
+BEGIN
+   DBMS_OUTPUT.PUT_LINE(F_AGREGAR_AL_CARRITO(1,2,2)); 
+END;
+
+SELECT * FROM CART;
+
 SELECT * FROM AFFILIATE;
+
+select * from CART_PRODUCT_DETAIL;
+
+--Este metodo me permite comprar un producto de forma instantanea
+CREATE OR REPLACE FUNCTION F_COMPRAR_CARRITO(
+AFFILIATE_ID IN NUMBER
+)
+RETURN NUMBER
+IS    
+    V_CID NUMBER;
+    V_SHID NUMBER := SHIPPING_SEQ.NEXTVAL;
+    V_DIRECCION VARCHAR(50);
+    V_AFFID NUMBER := AFFILIATE_ID;
+    V_PORCENTAJE_DESCUENTO NUMBER := 0;
+    V_SALEID NUMBER:= SALE_SEQ.NEXTVAL;
+    V_VALOR_VENTA NUMBER;
+    V_CARRITOACTIVO NUMBER;
+    V_SALIDA NUMBER := 0;
+    
+BEGIN
+    
+    SELECT COUNT(*) AS ACTIVO
+    INTO V_CARRITOACTIVO
+    FROM CART
+    WHERE ACTIVATE = 1 AND AFFILIATE_ID = V_AFFID; 
+
+    IF NVL(V_CARRITOACTIVO,0) != 0 THEN
+        
+        --Se obtiene el codigo del carrito
+        SELECT CART_ID
+        INTO V_CID
+        FROM CART
+        WHERE AFFILIATE_ID = V_AFFID AND ACTIVATE = 1;
+        
+        --Se obtiene la dirección del usuario para el envio
+        SELECT ADRRESS 
+        INTO V_DIRECCION
+        FROM AFFILIATE
+        WHERE AFFILIATE_ID = V_AFFID;
+        
+        --Creamos el envio y su estado va ser en proceso, esto debido a que necesita que se confirme la compra
+        INSERT INTO SHIPPING (
+            SHIPPING_ID,    
+            DATE_CHANGED,  
+            COMMENTS,
+            ESTIMATED_DELIVERY_DATE,  
+            ADRRESS,
+            STATUS_SHIPPING_ID
+        )
+        VALUES (
+            V_SHID,
+            SYSDATE + 20,  -- Esto habilita 20 días de cambio 
+            '',
+            SYSDATE + 15,
+            V_DIRECCION,
+            1
+        );
+        
+        --Calculamos cual es el valor porcentual que será descontado por todas las comisiones 
+        V_PORCENTAJE_DESCUENTO := COMISIONES_TOTALES_PARA_VENTA(V_AFFID);
+        V_VALOR_VENTA := F_CALCULAR_TOTAL_CARRITO(V_CID);
+        
+        --Ahora vamos a crear la compra
+        INSERT INTO SALE (
+            SALE_ID, 
+            DATE_SALE,
+            ORIGINAL_PRICE,
+            FINAL_PRICE,
+            SHIPPING_ID, 
+            STATUS_SALE_ID,
+            CART_ID       
+        )
+        VALUES (
+            V_SALEID,
+            SYSDATE,
+            V_VALOR_VENTA,
+            V_VALOR_VENTA -(V_VALOR_VENTA*(V_PORCENTAJE_DESCUENTO/100)),
+            V_SHID,
+            2,  -- Este estado nos indica de la compra está en transito
+            V_CID
+        );
+        --Desactivamos el carrito
+        UPDATE CART
+        SET ACTIVATE = 0
+        WHERE CART_ID  = V_CID;
+        
+        --Generamos todas las comisiones correspondientes
+        GENERAR_COMISIONES_DE_VENTA(V_AFFID, V_SALEID);
+        
+        V_SALIDA := V_SALEID;
+        
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('El afiliado no tiene carritos activos');
+    END IF;
+
+    RETURN V_SALIDA;
+    
+END;
+
+--Test
+--Parametro 1: AFFILIATE_ID
+begin
+    DBMS_OUTPUT.PUT_LINE(F_COMPRAR_CARRITO(1));
+end;
+
+
+select * from sale;
+
+select * from cart;
 -------------------------------------------------------------------------------------------------------------------------------
 --PROCEDIMIENTOS
 -------------------------------------------------------------------------------------------------------------------------------
@@ -762,6 +991,9 @@ SELECT * FROM COMMISSION;
 SELECT * FROM PRODUCT;
 
 SELECT * FROM SALE;
+
+
+
 CREATE OR REPLACE PROCEDURE PR_AGREGAR_AL_CARRITO(
 AFFILIATE_ID IN NUMBER,
 PRODUCT_ID IN NUMBER,
@@ -825,7 +1057,7 @@ BEGIN
         FROM CART
         WHERE ACTIVATE = 1 AND AFFILIATE_ID = V_AFFID;
 
-        --Buscamos si en el carrito ya se encuentra añadido el mismo producto, con el fin de acrualizar sus valores y no pegar otro registro
+        --Buscamos si en el carrito ya se encuentra añadido el mismo producto, con el fin de actualizar sus valores y no pegar otro registro
         V_FLAG_PRODUCTO := F_BUSCAR_PRODUCTO_EN_CARRITO(V_PID, V_CID);
         
         IF V_FLAG_PRODUCTO > 0 THEN

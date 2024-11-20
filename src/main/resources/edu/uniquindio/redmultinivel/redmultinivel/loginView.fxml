@@ -46,7 +46,7 @@
       </Button>
 
       <!-- Enlaces para recuperación de contraseña y registro -->
-      <Label layoutX="249.0" layoutY="270.0" text="Recuperar contraseña" textFill="#262c71" onMouseClicked="#mostrarVentanaRecuperarContrasenia"/>
-      <Label layoutX="136.0" layoutY="270.0" text="Registrarse" textFill="#262c71" onMouseClicked="#mostrarVentanaResgitro"/>
+      <Label layoutX="249.0" layoutY="270.0" text="Recuperar contraseña" textFill="#262c71" />
+      <Label layoutX="136.0" layoutY="270.0" text="Registrarse" textFill="#262c71" />
    </children>
 </AnchorPane>

@@ -1,18 +1,15 @@
 package edu.uniquindio.redmultinivel.redmultinivel.controller;
 
 import java.io.IOException;
-import java.net.URL;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import edu.uniquindio.redmultinivel.redmultinivel.App;
-import edu.uniquindio.redmultinivel.redmultinivel.data.AffiliateData;
+import edu.uniquindio.redmultinivel.redmultinivel.data.AfiliadoData;
+import edu.uniquindio.redmultinivel.redmultinivel.data.CompraData;
 import edu.uniquindio.redmultinivel.redmultinivel.data.ProductoData;
 import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.ProductoCarritoDto;
 import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.ProductoDto;
@@ -25,11 +22,14 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 public class MainController {
 
-    public TextField textFieldTelefono;
-    public TextField textFieldContrasenia;
+    private Stage mainStage;
+
+    private boolean carritoActivo;
+
     private ObservableList<ProductoCarritoDto> elementosCarrito = FXCollections.observableArrayList();
 
     private int affiliateId;
@@ -49,6 +49,9 @@ public class MainController {
 
     @FXML
     private TextField textFieldEmail;
+
+    @FXML
+    private TextField textFieldContrasenia;
 
     @FXML
     private TextField textFieldAddress;
@@ -81,8 +84,6 @@ public class MainController {
     @FXML
     private TableColumn<ProductoCarritoDto, Double> tableColumnValor;
 
-    @FXML
-    private ResourceBundle resources;
 
     @FXML
     private GridPane gridPaneProductos;
@@ -202,8 +203,26 @@ public class MainController {
         }
     }
 
+    /**
+     * Este metodo se divide en dos:
+     * 1. crea el carrito en la base de datos y le agrega los productos
+     * 2. Genera la compra del carrito
+     * @param event
+     */
     @FXML
     void comprarCarrito(ActionEvent event) {
+        actualizarCarrito();
+
+        int respuesta = CompraData.comprarCarrito(affiliateId);
+        if( respuesta != 0){
+            mostrarDialogoInformacionSEncabezado("Compra exitosa");
+            elementosCarrito.clear();
+            actualizarValorTotal();
+
+        }else{
+            mostrarDialogoInformacionSEncabezado("Hubo un error al generar la compra");
+        }
+
 
     }
 
@@ -217,11 +236,33 @@ public class MainController {
     }
 
     @FXML
-    public void initialize( int affiliateId) {
+    public void initialize(Stage mainStage, int affiliateId) {
+        this.mainStage = mainStage;
         this.affiliateId = affiliateId;
-        this.PercentageDescount = AffiliateData.obtenerDescuentoPorId(affiliateId);
+        this.PercentageDescount = AfiliadoData.obtenerDescuentoPorId(affiliateId);
+        this.carritoActivo = AfiliadoData.verificarSihayCarritoActivo(affiliateId);
         iniciarTablaCarrito();
         cargarproductos();
+        crearEventoCerrarVentana();
+    }
+
+    private void crearEventoCerrarVentana() {
+        mainStage.setOnCloseRequest(event -> {
+            event.consume();
+
+            cerrarVentana(mainStage);
+        });
+    }
+
+    /**
+     * Este método nos va a permitir guardar los productos del carrito cual el cliente sale de la app
+     * @param mainStage
+     */
+    private void cerrarVentana(Stage mainStage) {
+
+        actualizarCarrito();
+
+        mainStage.close();
     }
 
     /**
@@ -282,7 +323,8 @@ public class MainController {
 
 
     /**
-     * Este método nos permite inicializar todas las tabla al carrito, ademas le da la funcionalidad de
+     * Este método nos permite inicializar todas las tablas del carrito,
+     * además valida si el carrito al cerrar una sesión quedo con productos y los carga nuevamente
      * selección
      *
      * @author Daniel Arias
@@ -299,7 +341,28 @@ public class MainController {
             productoDtoSeleccionado = newSelection;
         });
 
+        if(carritoActivo){
+            cargarElementosCarrito();
+            actualizarValorTotal();
+        }
+
         tableViewCarrito.setItems(elementosCarrito);
+    }
+
+    /**
+     * se trae todo el carrito de la base de datos
+     */
+    private void cargarElementosCarrito() {
+        ArrayList<ProductoCarritoDto> productosEnCarrito = AfiliadoData.obtenerDatosCarrito(affiliateId);
+
+        if (!productosEnCarrito.isEmpty()) {
+            elementosCarrito.addAll(productosEnCarrito);
+        }
+
+    }
+
+    public void actualizarCarrito(){
+        AfiliadoData.actualizarCarrito(elementosCarrito, affiliateId);
     }
 
     private void refrescarTabla() {
@@ -461,5 +524,13 @@ private TextField txtAffiliateId;
         alerta.setTitle(titulo);
         alerta.setContentText(mensaje);
         alerta.showAndWait();
+    }
+
+    private void eventocerrarVenta(){
+
+
+        if (elementosCarrito.isEmpty()){
+            System.out.println("se guardan automaticamente ");
+        }
     }
 }

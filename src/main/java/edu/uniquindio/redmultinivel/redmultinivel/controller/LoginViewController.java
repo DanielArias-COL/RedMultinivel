@@ -1,27 +1,24 @@
 package edu.uniquindio.redmultinivel.redmultinivel.controller;
 
 import edu.uniquindio.redmultinivel.redmultinivel.App;
-import edu.uniquindio.redmultinivel.redmultinivel.data.AffiliateData;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class LoginViewController {
+public class LoginViewController  {
 
 
     private App app;
-    private Stage primaryStage;
+    private Stage mainStage = new Stage();
 
     @FXML
     private TextField txtUsuario_loginView;
@@ -29,6 +26,8 @@ public class LoginViewController {
     @FXML
     private PasswordField txtContraseña_loginView;
 
+
+    @FXML
     public void btnIngresar_loginView(ActionEvent actionEvent) {
 
         String email = txtUsuario_loginView.getText();
@@ -62,7 +61,13 @@ public class LoginViewController {
         }
     }
 
+    /**
+     * Este metodo inicializa la vista principal, ademas crea un evento para cuando se cierre el stage de esta.
+     * @param idAfiliado
+     * @throws IOException
+     */
     private void mostrarVistaMain(int idAfiliado) throws IOException {
+
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(App.class.getResource("main-view.fxml"));
 
@@ -70,11 +75,14 @@ public class LoginViewController {
 
         Scene escenaMain = new Scene(contenedorMain);
 
-        primaryStage.setScene(escenaMain);
+        mainStage.setScene(escenaMain);
 
         MainController controller= loader.getController();
 
-        controller.initialize(idAfiliado);
+        controller.initialize(mainStage, idAfiliado);
+
+        mainStage.show();
+        app.cerrarVentana();
     }
 
     private void mostrarMensaje(String titulo, String head, String content, Alert.AlertType tipo) {
@@ -88,7 +96,6 @@ public class LoginViewController {
 
     public void initialize(App app) {
         this.app = app;
-        this.primaryStage = app.getPrimaryStage();
     }
 
 
@@ -98,24 +105,4 @@ public class LoginViewController {
         Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         stage.close();
     }
-
-    public void mostrarVentanaRecuperarContrasenia(MouseEvent mouseEvent) {
-        // Comentado el código de recuperación de contraseña
-    }
-
-    public void mostrarVentanaResgitro(MouseEvent mouseEvent) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/edu/uniquindio/redmultinivel/redmultinivel/registroView.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Registro de Usuario");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error cargando la ventana de registro.");
-        }
-    }
-
-
 }

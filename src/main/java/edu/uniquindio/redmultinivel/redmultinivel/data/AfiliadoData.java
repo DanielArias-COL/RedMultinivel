@@ -1,55 +1,150 @@
 package edu.uniquindio.redmultinivel.redmultinivel.data;
 
-import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.LoginDto;
+import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.ProductoCarritoDto;
 import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.ProductoDto;
+import javafx.collections.ObservableList;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class AfiliadoData {
 
-//    public static boolean obtenerDatosLogin(String correo,String contrasenia)  {
-//
-//
-//        LoginDto loginDto = new LoginDto();
-//        //List<ProductoDto> productos = new ArrayList<>();
-//
-//        Connection conn = ConexionOracle.getConn();
-//        PreparedStatement stmt = null;
-//        try {
-//            stmt = conn.prepareStatement("SELECT * FROM AFFILIATE WHERE EMAIL = " + correo);
-//
-//            ResultSet rslt = stmt.executeQuery();
-//
-//            while (rslt.next()) {
-//                loginDto.setCorreo(rslt.getString("EMAIL"));
-//                loginDto.setContrasenia(rslt.getString("PASSWORD"));
-//                // Crea un nuevo objeto ProductoDto y asigna valores desde el ResultSet
-////                ProductoDto producto = new ProductoDto();
-////                producto.setCodigo(rslt.getInt("PRODUCT_ID"));
-////                producto.setName(rslt.getString("NAME"));
-////                producto.setValor(rslt.getDouble("SALE_PRICE"));
-////                producto.setImagePath(rslt.getString("PATH_IMAGE"));
-////                System.out.println(producto.toString());
-////
-////                // Agrega el producto a la lista
-////                productos.add(producto);
-//            }
-//
-//            conn.close();
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        if(loginDto.getCorreo().equals(correo) && loginDto.getContrasenia().equals()){
-//
-//        }
-//
-//        return productos;
-//
-//    }
+    public static int obtenerDescuentoPorId(int affiliateId)  {
+
+        int salida=0;
+        String query = "{? = CALL CALCULAR_DESCUENTO_POR_AFFILIATEID(?)}";
+
+        try(Connection conn = ConexionOracle.getConn();
+            CallableStatement cstmt = conn.prepareCall(query)){
+
+            //parametros de salida
+            cstmt.registerOutParameter(1, java.sql.Types.INTEGER);
+
+            //parametros de entrada
+            cstmt.setInt(2, affiliateId);
+
+            //se ejecuta la consulta
+            cstmt.execute();
+
+            // Obtener el valor del parámetro de salida
+            salida = cstmt.getInt(1);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al calcular el descuento del afiliado",e);
+        }
+
+        return salida;
+    }
+
+    public static void validarCredenciales(String email, String password) {
+
+        try (Connection connection = ConexionOracle.getConn()) {
+            String sql = "{CALL login_email_affiliate(?, ?)}";
+            try (CallableStatement statement = connection.prepareCall(sql)) {
+                statement.setString(1, email);
+                statement.setString(2, password);
+                statement.execute();
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al obtener El Descuento del empleado",e);
+        }
+    }
+
+    public static ArrayList<ProductoCarritoDto> obtenerDatosCarrito(int afiliadoId){
+        ArrayList<ProductoCarritoDto> productos = new ArrayList<>();
+
+        String query = "SELECT P.PRODUCT_ID, P.NAME, CPD.QUANTITY, (CPD.QUANTITY * P.SALE_PRICE) AS VALOR FROM CART_PRODUCT_DETAIL CPD INNER JOIN PRODUCT P ON P.PRODUCT_ID = CPD.PRODUCT_ID WHERE CPD.CART_ID = ( SELECT CART_ID FROM CART WHERE ACTIVATE = 1 AND AFFILIATE_ID = ? )";
+
+        try(Connection conn = ConexionOracle.getConn();
+            PreparedStatement pstmt = conn.prepareStatement(query)){
+
+            pstmt.setInt(1, afiliadoId);
+
+            try(ResultSet rs = pstmt.executeQuery()){
+
+                while(rs.next()){
+                    ProductoCarritoDto producto = new ProductoCarritoDto(
+                        rs.getInt("PRODUCT_ID"),
+                        rs.getString("NAME"),
+                        rs.getInt("QUANTITY"),
+                        rs.getDouble("VALOR")
+                    );
+                    productos.add(producto);
+                }
+
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al obtener el carrito actual",e);
+        }
+
+        return productos;
+    }
+
+    public static boolean verificarSihayCarritoActivo(int afiliadoId){
+
+        String query = "SELECT CART_ID FROM CART WHERE ACTIVATE = 1 AND AFFILIATE_ID = ?";
+        boolean salida = false;
+
+        try(Connection conn = ConexionOracle.getConn();
+            PreparedStatement pstmt = conn.prepareStatement(query)){
+
+            pstmt.setInt(1, afiliadoId);
+
+            try(ResultSet rs = pstmt.executeQuery()){
+
+                if(rs.next()){
+                    salida = true;
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al calcular el descuento del afiliado",e);
+        }
+
+        return salida;
+    }
+
+    public static void actualizarCarrito(ObservableList<ProductoCarritoDto> CarritoNuevo, int afiliadoId) {
+
+        vaciarCarrito(afiliadoId);
+        CompraData.CargarCarrito(CarritoNuevo, afiliadoId);
+    }
+
+    public static void actualizarUnProductoCarrito(int cantidad, int afiliadoId, int productoId){
+        String query = "UPDATE CART_PRODUCT_DETAIL SET QUANTITY = ? WHERE CART_ID = (SELECT CART_ID FROM CART  WHERE ACTIVATE = 1 AND AFFILIATE_ID = ?) AND PRODUCT_ID = ?";
+
+        try (Connection conn = ConexionOracle.getConn();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+                pstmt.setInt(1, cantidad);
+                pstmt.setInt(2, afiliadoId);
+                pstmt.setInt(3, productoId);
+
+                int rowsAffected = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Se presento un error actualizando el registro", e);
+        }
+    }
+
+    /**
+     * Busca el carrito usuario del usuario y lo vacea
+     * @param afiliadoId
+     */
+    public static void vaciarCarrito(int afiliadoId){
+        String query = "DELETE FROM CART_PRODUCT_DETAIL WHERE CART_ID = (SELECT CART_ID FROM CART WHERE ACTIVATE = 1 AND AFFILIATE_ID = ?)";
+
+        try (Connection conn = ConexionOracle.getConn();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, afiliadoId);
+
+            int rowsAffected = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Se presento un error vaciando el registro", e);
+        }
+    }
 }
