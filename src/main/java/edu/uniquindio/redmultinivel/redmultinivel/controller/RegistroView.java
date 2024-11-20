@@ -1,98 +1,92 @@
 package edu.uniquindio.redmultinivel.redmultinivel.controller;
 
+import edu.uniquindio.redmultinivel.redmultinivel.data.AffiliateData;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import javafx.stage.Stage;
 
 public class RegistroView {
-    public TextField cedulaTextField;
-    public TextField nombreTextField;
-    public TextField apellidoTextField;
-    public TextField dirrecionTextField;
-    public TextField correoTextField;
-    public PasswordField contrasenaPasswordField;
-    public PasswordField confirmarContrasenaPasswordField;
-    public TextField textFieldParentAffiliateId;
 
-    private void mostrarAlerta(String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error de Registro");
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
-    }
-    private void limpiarCampos() {
-        cedulaTextField.setText("");
-        nombreTextField.setText("");
-        apellidoTextField.setText("");
-        correoTextField.setText("");
-        dirrecionTextField.setText("");
-        contrasenaPasswordField.setText("");
-        confirmarContrasenaPasswordField.setText("");
-    }
+    @FXML
+    private TextField cedulaTextField;
 
-    public void registrarCuenta(ActionEvent actionEvent) {
-        // Capturar los valores ingresados
-        String affiliateId = cedulaTextField.getText();
-        String firstName = nombreTextField.getText();
-        String lastName = apellidoTextField.getText();
-        String email = correoTextField.getText();
-        String address = dirrecionTextField.getText();
-        String contrasenia = contrasenaPasswordField.getText();
-        String contraseniaConfirm = confirmarContrasenaPasswordField.getText();
+    @FXML
+    private TextField nombreTextField;
 
-       //String hierarchicalLevel = textFieldHierarchicalLevel.getText();
+    @FXML
+    private TextField apellidoTextField;
+
+    @FXML
+    private TextField dirrecionTextField;
+
+    @FXML
+    private TextField correoTextField;
+
+    @FXML
+    private PasswordField contrasenaPasswordField;
+
+    @FXML
+    private PasswordField confirmarContrasenaPasswordField;
+
+    @FXML
+    private TextField textFieldParentAffiliateId;
+
+    @FXML
+    private void registrarCuenta(ActionEvent event) {
+        String cedula = cedulaTextField.getText();
+        String nombre = nombreTextField.getText();
+        String apellido = apellidoTextField.getText();
+        String direccion = dirrecionTextField.getText();
+        String correo = correoTextField.getText();
+        String contrasena = contrasenaPasswordField.getText();
+        String confirmarContrasena = confirmarContrasenaPasswordField.getText();
         String parentAffiliateId = textFieldParentAffiliateId.getText();
 
-        if (affiliateId.isEmpty()|| firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || address.isEmpty()) {
-            mostrarAlerta("Todos los campos son obligatorios.");
+        // Validaciones básicas
+        if (cedula.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || direccion.isEmpty() ||
+                correo.isEmpty() || contrasena.isEmpty() || confirmarContrasena.isEmpty()) {
+            mostrarMensaje("Error", "Campos incompletos", "Por favor completa todos los campos.", Alert.AlertType.ERROR);
             return;
         }
-        if(!contrasenia.equals(contraseniaConfirm)){
-            mostrarAlerta("Las contraseñas no coinciden");
+
+        if (!contrasena.equals(confirmarContrasena)) {
+            mostrarMensaje("Error", "Contraseñas no coinciden", "Las contraseñas ingresadas no son iguales.", Alert.AlertType.ERROR);
             return;
         }
-        // Conexión a la base de datos y ejecución del procedimiento
-        try (Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "felipe", "12345")) {
-            String sql = "{CALL insertar_affiliate(?, ?, ?, ?, ?, ?, ?, ?)}";
-            try (CallableStatement callableStatement = connection.prepareCall(sql)) {
-                callableStatement.setInt(1, Integer.parseInt(affiliateId));
-                callableStatement.setString(2, firstName);
-                callableStatement.setString(3, lastName);
-                callableStatement.setString(4, email);
-                callableStatement.setString(5, contrasenia);
-                callableStatement.setInt(6, 1); // Activar
-                callableStatement.setString(7, address);
-                //Esto es un trigger
-                //callableStatement.setInt(8, Integer.parseInt(hierarchicalLevel));
-                callableStatement.setObject(9, parentAffiliateId.isEmpty() ? null : Integer.parseInt(parentAffiliateId));
 
-                callableStatement.execute();
+        try {
+            // Lógica para guardar los datos del afiliado en la base de datos
+            AffiliateData.registrarAfiliado(cedula, nombre, apellido, direccion, correo, contrasena, parentAffiliateId);
 
-                // Mostrar mensaje de éxito
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Éxito");
-                alert.setHeaderText(null);
-                alert.setContentText("Afiliado agregado exitosamente.");
-                alert.showAndWait();
-            }
-        } catch (SQLException | NumberFormatException e) {
-            // Mostrar mensaje de error
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(null);
-            alert.setContentText("No se pudo agregar el afiliado: " + e.getMessage());
-            alert.showAndWait();
+            // Mostrar mensaje de éxito
+            mostrarMensaje("Éxito", "Registro exitoso", "La cuenta ha sido registrada con éxito.", Alert.AlertType.INFORMATION);
+
+            // Cerrar la ventana de registro
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("Error", "Registro fallido", "Ocurrió un error al registrar la cuenta. Inténtalo de nuevo.", Alert.AlertType.ERROR);
         }
-        limpiarCampos();
     }
 
-    public void salir(ActionEvent actionEvent) {
+    @FXML
+    private void salir(ActionEvent event) {
+        // Cierra la ventana actual
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.close();
+    }
+
+    private void mostrarMensaje(String titulo, String cabecera, String contenido, Alert.AlertType tipo) {
+        Alert alerta = new Alert(tipo);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(cabecera);
+        alerta.setContentText(contenido);
+        alerta.showAndWait();
     }
 }
