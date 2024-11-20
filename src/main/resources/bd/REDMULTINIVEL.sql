@@ -43,6 +43,88 @@ Comprar un todo lo de un carrito:
 - se agrega el carrito y se asigna el estado de la venta
 - se crea un envio y segun el estado de la venta se cambia el estado del envio
 */
+--Evitar duplicados en el carrito
+CREATE OR REPLACE TRIGGER TRG_PREVENT_DUPLICATE_PRODUCTS
+BEFORE INSERT ON CART_PRODUCT_DETAIL
+FOR EACH ROW
+DECLARE
+v_count NUMBER;
+BEGIN
+SELECT COUNT(*) INTO v_count
+FROM CART_PRODUCT_DETAIL
+WHERE CART_ID = :NEW.CART_ID AND PRODUCT_ID = :NEW.PRODUCT_ID;
+
+IF v_count > 0 THEN
+    RAISE_APPLICATION_ERROR(-20004, 'El producto ya está en el carrito.');
+END IF;
+END;
+/
+
+--Verificar que al registrarse, se verifique los duplicados de correo
+CREATE OR REPLACE TRIGGER TRG_VALIDATE_EMAIL
+BEFORE INSERT OR UPDATE ON AFFILIATE
+                            FOR EACH ROW
+DECLARE
+v_count NUMBER;
+BEGIN
+SELECT COUNT(*) INTO v_count
+FROM AFFILIATE
+WHERE EMAIL = :NEW.EMAIL AND AFFILIATE_ID != :NEW.AFFILIATE_ID;
+
+IF v_count > 0 THEN
+    RAISE_APPLICATION_ERROR(-20003, 'El correo electrónico ya está registrado.');
+END IF;
+END;
+
+--Actualizar Estado de Envio
+CREATE OR REPLACE TRIGGER TRG_UPDATE_SHIPPING_STATUS
+AFTER INSERT OR UPDATE ON SHIPPING
+                           FOR EACH ROW
+BEGIN
+  IF :NEW.ESTIMATED_DELIVERY_DATE < SYSDATE THEN
+UPDATE SHIPPING
+SET STATUS_SHIPPING_ID = 3  -- Entregado
+WHERE SHIPPING_ID = :NEW.SHIPPING_ID;
+END IF;
+END;
+/
+
+--Generar Comision despues de venta
+CREATE OR REPLACE TRIGGER TRG_GENERATE_COMMISSION
+AFTER INSERT ON SALE
+FOR EACH ROW
+DECLARE
+v_affiliate_id NUMBER;
+  v_parent_id NUMBER;
+  v_commission_value NUMBER;
+BEGIN
+SELECT CART.AFFILIATE_ID INTO v_affiliate_id
+FROM CART WHERE CART_ID = :NEW.CART_ID;
+
+v_parent_id := v_affiliate_id;
+
+FOR i IN 1..4 LOOP
+    IF v_parent_id IS NULL THEN
+      EXIT;
+END IF;
+
+    v_commission_value := :NEW.FINAL_PRICE * CASE i
+      WHEN 1 THEN 0.10
+      WHEN 2 THEN 0.05
+      WHEN 3 THEN 0.03
+      ELSE 0.01
+END;
+
+INSERT INTO COMMISSION (COMMISSION_ID, VALOR, SALE_ID, AFFILIATE_ID)
+VALUES (SEQ_COMMISSION_ID.NEXTVAL, v_commission_value, :NEW.SALE_ID, v_parent_id);
+
+SELECT AFFILIATE_PARENT_ID INTO v_parent_id
+FROM AFFILIATE
+WHERE AFFILIATE_ID = v_parent_id;
+END LOOP;
+END;
+/
+
 --Actualizar total carrito
 CREATE OR REPLACE TRIGGER trg_update_cart_total
 AFTER INSERT OR UPDATE OR DELETE ON CART_PRODUCT_DETAIL
@@ -74,6 +156,21 @@ SET ACTIVATE = 0
 WHERE CART_ID = :NEW.CART_ID;
 END;
 
+--Actulizar total carrito despues de quitar un prodcuto
+    CREATE OR REPLACE TRIGGER TRG_UPDATE_CART_TOTAL_REMOVE
+AFTER DELETE ON CART_PRODUCT_DETAIL
+FOR EACH ROW
+BEGIN
+UPDATE CART
+SET TOTAL = TOTAL - :OLD.TOTAL_AMOUNT
+WHERE CART_ID = :OLD.CART_ID;
+END;
+/
+
+
+
+
+
 --
 ---Calular nivel jerarquico del afiliado
 CREATE OR REPLACE TRIGGER trg_update_hierarchical_level
@@ -100,7 +197,36 @@ UPDATE AFFILIATE
 SET HIERARCHICAL_LEVEL_ID = v_new_level_id
 WHERE AFFILIATE_ID = :NEW.AFFILIATE_PARENT_ID;
 END;
+
+    --Trigger para reducir el stock al realizar una venta
+    CREATE OR REPLACE TRIGGER TRG_UPDATE_PRODUCT_STOCK_AFTER_SALE
+AFTER INSERT ON SALE
+FOR EACH ROW
+BEGIN
+  -- Iterar sobre los productos vendidos en la venta asociada
+FOR product IN (
+    SELECT PRODUCT_ID, QUANTITY
+    FROM CART_PRODUCT_DETAIL
+    WHERE CART_ID = :NEW.CART_ID
+  )
+  LOOP
+    -- Reducir el stock del producto
+UPDATE PRODUCT
+SET STOCK_QUANTITY = STOCK_QUANTITY - product.QUANTITY
+WHERE PRODUCT_ID = product.PRODUCT_ID;
+END LOOP;
+END;
 /
+
+
+
+
+
+
+
+
+
+
 
 
 --Nuevo procedimiento del carrito para agregar
