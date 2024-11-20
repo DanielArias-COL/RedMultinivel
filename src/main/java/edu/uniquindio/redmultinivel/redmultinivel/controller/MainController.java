@@ -439,7 +439,7 @@ public class MainController {
 
 
     @FXML
-    private void onAgregarAfiliado() {
+    private void agregarAfiliado() {
         // Capturar los valores ingresados
         String affiliateId = textFieldAffiliateId.getText();
         String firstName = textFieldFirstName.getText();
@@ -447,40 +447,8 @@ public class MainController {
         String email = textFieldEmail.getText();
         String address = textFieldAddress.getText();
         String contrasenia = textFieldContrasenia.getText();
-        String hierarchicalLevel = textFieldHierarchicalLevel.getText();
-        String parentAffiliateId = textFieldParentAffiliateId.getText();
 
-        // Conexión a la base de datos y ejecución del procedimiento
-        try (Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "felipe", "12345")) {
-            String sql = "{CALL insertar_affiliate(?, ?, ?, ?, ?, ?, ?, ?)}";
-            try (CallableStatement callableStatement = connection.prepareCall(sql)) {
-                callableStatement.setInt(1, Integer.parseInt(affiliateId));
-                callableStatement.setString(2, firstName);
-                callableStatement.setString(3, lastName);
-                callableStatement.setString(4, email);
-                callableStatement.setString(5, contrasenia);
-                callableStatement.setInt(6, 1); // Activar
-                callableStatement.setString(7, address);
-                callableStatement.setInt(8, Integer.parseInt(hierarchicalLevel));
-                callableStatement.setObject(9, parentAffiliateId.isEmpty() ? null : Integer.parseInt(parentAffiliateId));
-
-                callableStatement.execute();
-
-                // Mostrar mensaje de éxito
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Éxito");
-                alert.setHeaderText(null);
-                alert.setContentText("Afiliado agregado exitosamente.");
-                alert.showAndWait();
-            }
-        } catch (SQLException | NumberFormatException e) {
-            // Mostrar mensaje de error
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(null);
-            alert.setContentText("No se pudo agregar el afiliado: " + e.getMessage());
-            alert.showAndWait();
-        }
+        System.out.println("aca va el llamado para crear el afiliado");
     }
 
 /////////////////////////////
