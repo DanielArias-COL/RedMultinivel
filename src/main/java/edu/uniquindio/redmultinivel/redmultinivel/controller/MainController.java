@@ -7,6 +7,7 @@ import edu.uniquindio.redmultinivel.redmultinivel.App;
 import edu.uniquindio.redmultinivel.redmultinivel.data.AfiliadoData;
 import edu.uniquindio.redmultinivel.redmultinivel.data.CompraData;
 import edu.uniquindio.redmultinivel.redmultinivel.data.ProductoData;
+import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.ComisionDto;
 import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.ProductoCarritoDto;
 import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.ProductoDto;
 import javafx.collections.FXCollections;
@@ -27,12 +28,17 @@ public class MainController {
     private boolean carritoActivo;
 
     private ObservableList<ProductoCarritoDto> elementosCarrito = FXCollections.observableArrayList();
+    private ObservableList<ComisionDto> elementosComisiones = FXCollections.observableArrayList();
+
 
     private int affiliateId;
 
     private int PercentageDescount;
 
     private ProductoCarritoDto productoDtoSeleccionado;
+
+    @FXML
+    private Label labelTotalComisiones;
 
     @FXML
     private TextField textFieldFirstName;
@@ -58,6 +64,7 @@ public class MainController {
     @FXML
     private TextField textOriginalValue;
 
+    //Columnas carrito
     @FXML
     private TableView<ProductoCarritoDto> tableViewCarrito;
 
@@ -73,6 +80,29 @@ public class MainController {
 
     @FXML
     private TableColumn<ProductoCarritoDto, Double> tableColumnValor;
+
+    //Columnas comision
+
+    @FXML
+    private TableView<ComisionDto> tableViewComision;
+
+    @FXML
+    private TableColumn<ComisionDto, Integer> tableColumnCodigoComision;
+
+    @FXML
+    private TableColumn<ComisionDto, Long> tableColumnCedulaVendedor;
+
+    @FXML
+    private TableColumn<ComisionDto, String> tableColumnNombreVendedor;
+
+    @FXML
+    private TableColumn<ComisionDto, String> tableColumnApellidoVendedor;
+
+    @FXML
+    private TableColumn<ComisionDto, Integer> tableColumnVentaAsociada;
+
+    @FXML
+    private TableColumn<ComisionDto, Double> tableColumnValorComision;
 
 
     @FXML
@@ -232,6 +262,7 @@ public class MainController {
         this.PercentageDescount = AfiliadoData.obtenerDescuentoPorId(affiliateId);
         this.carritoActivo = AfiliadoData.verificarSihayCarritoActivo(affiliateId);
         iniciarTablaCarrito();
+        iniciarTablaComision();
         cargarproductos();
         crearEventoCerrarVentana();
     }
@@ -337,6 +368,42 @@ public class MainController {
         }
 
         tableViewCarrito.setItems(elementosCarrito);
+    }
+
+    private void iniciarTablaComision() {
+        //los nombres que se le dan como codigo,fechaInicio tienen que estar igual a como aparecen en el paquete util
+        //se vincula elementos del objetos con cada una de las columnas de la tabla
+        tableColumnCodigoComision.setCellValueFactory(new PropertyValueFactory<ComisionDto, Integer>("comisionId"));
+        tableColumnCedulaVendedor.setCellValueFactory(new PropertyValueFactory<ComisionDto, Long>("cedulaVendedor"));
+        tableColumnNombreVendedor.setCellValueFactory(new PropertyValueFactory<ComisionDto, String>("nombreVendedor"));
+        tableColumnApellidoVendedor.setCellValueFactory(new PropertyValueFactory<ComisionDto, String>("apellidoVendedor"));
+        tableColumnVentaAsociada.setCellValueFactory(new PropertyValueFactory<ComisionDto, Integer>("ventaAsociada"));
+        tableColumnValorComision.setCellValueFactory(new PropertyValueFactory<ComisionDto, Double>("valor"));
+
+        cargarElementosComision();
+        actualizarValorTotalComision();
+
+
+        tableViewComision.setItems(elementosComisiones);
+    }
+
+    private void actualizarValorTotalComision() {
+        int valor = 0;
+        for(ComisionDto comisiion : elementosComisiones){
+            valor += comisiion.getValor();
+        }
+
+        labelTotalComisiones.setText(Double.toString(valor));
+
+    }
+
+    private void cargarElementosComision() {
+        ArrayList<ComisionDto> comisiones = AfiliadoData.obtenerDatosComision(affiliateId);
+
+        if (!comisiones.isEmpty()) {
+            elementosComisiones.addAll(comisiones);
+        }
+
     }
 
     /**

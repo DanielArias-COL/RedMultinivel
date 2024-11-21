@@ -36,7 +36,7 @@
             </Button>
          </children>
       </VBox>
-      <AnchorPane fx:id="anchorPaneAgregarTienda" layoutX="217.0" layoutY="-1.0" prefHeight="820.0" prefWidth="614.0" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css">
+      <AnchorPane fx:id="anchorPaneAgregarTienda" layoutX="217.0" layoutY="-1.0" prefHeight="820.0" prefWidth="614.0" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css" visible="false">
           <children>
               <ScrollPane layoutX="-13.0" layoutY="6.0" prefHeight="810.0" prefWidth="625.0" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css">
                   <content>
@@ -56,7 +56,7 @@
               </ScrollPane>
           </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPaneCarrito" layoutX="839.0" prefHeight="820.0" prefWidth="387.0" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css">
+      <AnchorPane fx:id="anchorPaneCarrito" layoutX="839.0" prefHeight="820.0" prefWidth="387.0" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css" visible="false">
          <children>
             <TableView fx:id="tableViewCarrito" layoutX="7.0" layoutY="51.0" prefHeight="480.0" prefWidth="374.0">
               <columns>
@@ -102,7 +102,47 @@
             </Button>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPaneComision" layoutX="217.0" prefHeight="820.0" prefWidth="1009.0" style="-fx-background-color: d2e6ea;" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css" visible="false" />
+      <AnchorPane fx:id="anchorPaneComision" layoutX="204.0" prefHeight="820.0" prefWidth="1025.0" style="-fx-background-color: d2e6ea;" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css">
+         <children>
+            <Pane layoutX="-1.0" prefHeight="43.0" prefWidth="1025.0" style="-fx-background-color: #bcc4c5;">
+               <children>
+                  <Text layoutX="469.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Comissiones" wrappingWidth="159.0">
+                     <font>
+                        <Font name="Arial Black" size="15.0" />
+                     </font>
+                  </Text>
+               </children>
+            </Pane>
+            <Pane layoutX="216.0" layoutY="88.0" prefHeight="688.0" prefWidth="633.0" style="-fx-border-color: #bcc4c5;">
+               <children>
+                  <Pane layoutX="1.0" layoutY="655.0" prefHeight="32.0" prefWidth="633.0" style="-fx-background-color: #bcc4c5;">
+                     <children>
+                        <Text layoutX="253.0" layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Total Bonificado:" wrappingWidth="159.0">
+                           <font>
+                              <Font name="Arial Black" size="13.0" />
+                           </font>
+                        </Text>
+                        <Label layoutX="417.0" layoutY="6.0" text="\$" />
+                        <Label fx:id="labelTotalComisiones" layoutX="436.0" layoutY="6.0" text="0" />
+                     </children>
+                  </Pane>
+                  <ScrollPane layoutX="-1.0" layoutY="1.0" prefHeight="653.0" prefWidth="634.0">
+                     <content>
+                        <TableView fx:id="tableViewComision" prefHeight="652.0" prefWidth="630.0">
+                          <columns>
+                            <TableColumn fx:id="tableColumnCodigoComision" prefWidth="78.0" text="Codigo" />
+                            <TableColumn fx:id="tableColumnCedulaVendedor" prefWidth="128.0" text="Cédula Vendedor" />
+                              <TableColumn fx:id="tableColumnNombreVendedor" prefWidth="88.0" text="Nombre" />
+                              <TableColumn fx:id="tableColumnApellidoVendedor" prefWidth="111.0" text="Apellido" />
+                              <TableColumn fx:id="tableColumnVentaAsociada" prefWidth="111.0" text="Venta Aociada" />
+                              <TableColumn fx:id="tableColumnValorComision" prefWidth="111.0" text="Valor" />
+                          </columns>
+                        </TableView>
+                     </content>
+                  </ScrollPane>
+               </children>
+            </Pane>
+         </children></AnchorPane>
        <AnchorPane fx:id="anchorPaneAgregarEquipo" layoutX="201.0" prefHeight="820.0" prefWidth="1025.0" style="-fx-background-color: d2e6ea;" stylesheets="@../../../../css/fullpackstyling.css" visible="false">
            <children>
             <Pane layoutX="231.0" layoutY="90.0" prefHeight="602.0" prefWidth="535.0" style="-fx-border-color: #bcc4c5;">

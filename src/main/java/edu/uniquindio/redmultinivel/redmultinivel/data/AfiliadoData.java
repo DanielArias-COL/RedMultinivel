@@ -1,5 +1,6 @@
 package edu.uniquindio.redmultinivel.redmultinivel.data;
 
+import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.ComisionDto;
 import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.ProductoCarritoDto;
 import edu.uniquindio.redmultinivel.redmultinivel.dtos.productodtos.ProductoDto;
 import javafx.collections.ObservableList;
@@ -81,6 +82,41 @@ public class AfiliadoData {
 
         return productos;
     }
+
+    public static ArrayList<ComisionDto> obtenerDatosComision(int afiliadoId){
+        ArrayList<ComisionDto> comisiones = new ArrayList<>();
+
+        String query = "SELECT  C.COMMISSION_ID, A.AFFILIATE_ID, A.FIRST_NAME, A.LAST_NAME, C.SALE_ID, C.VALOR FROM COMMISSION C INNER JOIN AFFILIATE A ON C.AFFILIATE_ID = A.AFFILIATE_ID WHERE C.AFFILIATE_ID = ?";
+
+        try(Connection conn = ConexionOracle.getConn();
+            PreparedStatement pstmt = conn.prepareStatement(query)){
+
+            pstmt.setInt(1, afiliadoId);
+
+            try(ResultSet rs = pstmt.executeQuery()){
+
+                while(rs.next()){
+                    ComisionDto comision = new ComisionDto(
+                            rs.getInt("COMMISSION_ID"),
+                            rs.getLong("AFFILIATE_ID"),
+                            rs.getString("FIRST_NAME"),
+                            rs.getString("LAST_NAME"),
+                            rs.getInt("SALE_ID"),
+                            rs.getDouble("VALOR")
+                    );
+                    comisiones.add(comision);
+                }
+
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al obtener las comisiones",e);
+        }
+
+        return comisiones;
+    }
+
+
 
     public static boolean verificarSihayCarritoActivo(int afiliadoId){
 
