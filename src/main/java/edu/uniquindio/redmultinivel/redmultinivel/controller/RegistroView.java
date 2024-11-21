@@ -59,15 +59,15 @@ public class RegistroView {
         }
 
         try {
-            // Lógica para guardar los datos del afiliado en la base de datos
-            AffiliateData.registrarAfiliado(cedula, nombre, apellido, direccion, correo, contrasena, parentAffiliateId);
-
-            // Mostrar mensaje de éxito
-            mostrarMensaje("Éxito", "Registro exitoso", "La cuenta ha sido registrada con éxito.", Alert.AlertType.INFORMATION);
-
-            // Cerrar la ventana de registro
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.close();
+//            // Lógica para guardar los datos del afiliado en la base de datos
+//            AffiliateData.registrarAfiliado(cedula, nombre, apellido, direccion, correo, contrasena, parentAffiliateId);
+//
+//            // Mostrar mensaje de éxito
+//            mostrarMensaje("Éxito", "Registro exitoso", "La cuenta ha sido registrada con éxito.", Alert.AlertType.INFORMATION);
+//
+//            // Cerrar la ventana de registro
+//            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+//            stage.close();
 
         } catch (Exception e) {
             e.printStackTrace();

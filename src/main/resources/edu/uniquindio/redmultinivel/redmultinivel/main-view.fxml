@@ -102,8 +102,8 @@
             </Button>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPaneComision" layoutX="217.0" prefHeight="820.0" prefWidth="1009.0" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css" visible="false" />
-       <AnchorPane fx:id="anchorPaneAgregarEquipo" layoutX="201.0" prefHeight="820.0" prefWidth="1025.0" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css" visible="false">
+      <AnchorPane fx:id="anchorPaneComision" layoutX="217.0" prefHeight="820.0" prefWidth="1009.0" style="-fx-background-color: d2e6ea;" styleClass="colorpanel" stylesheets="@../../../../css/fullpackstyling.css" visible="false" />
+       <AnchorPane fx:id="anchorPaneAgregarEquipo" layoutX="201.0" prefHeight="820.0" prefWidth="1025.0" style="-fx-background-color: d2e6ea;" stylesheets="@../../../../css/fullpackstyling.css" visible="false">
            <children>
             <Pane layoutX="231.0" layoutY="90.0" prefHeight="602.0" prefWidth="535.0" style="-fx-border-color: #bcc4c5;">
                <children>
@@ -112,24 +112,21 @@
                         <Label prefHeight="21.0" prefWidth="92.0" text="Nombres:" GridPane.rowIndex="1" />
                         <Label text="Apellidos:" GridPane.rowIndex="2" />
                         <Label text="Email:" GridPane.rowIndex="3" />
-                        <Label text="Clave:" GridPane.rowIndex="5" />
-                        <Label text="Direccion:" GridPane.rowIndex="6" />
-                           <Label text="Direccion:" GridPane.rowIndex="4" />
-                           <TextField fx:id="textFieldAffiliateId" prefWidth="300.0" GridPane.columnIndex="1" />
+                        <Label text="Clave:" GridPane.rowIndex="4" />
+                        <Label text="Direccion:" GridPane.rowIndex="5" />
                            <TextField fx:id="textFieldFirstName" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                            <TextField fx:id="textFieldLastName" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                            <TextField fx:id="textFieldEmail" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                           <TextField fx:id="textFieldAddress" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                        <TextField fx:id="textFieldContrasenia" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                        <Label text="Email:" />
-                        <TextField fx:id="textFieldAddress" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                           <TextField fx:id="textFieldAddress" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <TextField fx:id="textFieldContrasenia" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Label text="Cédula:" />
+                        <TextField fx:id="textFieldCedula" prefWidth="300.0" GridPane.columnIndex="1" />
                      </children>
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="203.0" minWidth="10.0" prefWidth="199.0" />
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="216.0" minWidth="10.0" prefWidth="216.0" />
                      </columnConstraints>
                      <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -149,7 +146,7 @@
                   </Text>
                </children>
             </Pane>
-            <Button layoutX="384.0" layoutY="750.0" mnemonicParsing="false" onAction="#agregarAfiliado" prefHeight="39.0" prefWidth="257.0" styleClass="buttoncompra" stylesheets="@../../../../css/fullpackstyling.css" text="AgregarAfiliado" textFill="#ebe8e8" />
+            <Button layoutX="384.0" layoutY="750.0" mnemonicParsing="false" onAction="#agregarAfiliado" prefHeight="39.0" prefWidth="257.0" styleClass="buttoncompra" stylesheets="@../../../../css/fullpackstyling.css" text="agregarAfiliado" textFill="#ebe8e8" />
            </children>
        </AnchorPane>
    </children>

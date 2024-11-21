@@ -35,42 +35,4 @@ public class AffiliateData {
         return salida;
     }
 
-    public static void validarCredenciales(String email, String password) {
-
-        try (Connection connection = ConexionOracle.getConn()) {
-            String sql = "{CALL login_email_affiliate(?, ?)}";
-            try (CallableStatement statement = connection.prepareCall(sql)) {
-                statement.setString(1, email);
-                statement.setString(2, password);
-                statement.execute();
-
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al obtener El Descuento del empleado",e);
-        }
-    }
-
-
-    public static void registrarAfiliado(String cedula, String nombre, String apellido, String direccion,
-                                         String correo, String contrasena, String parentAffiliateId) throws Exception {
-
-        String sql = "{CALL REGISTRAR_AFILIADO(?,?,?,?,?,?,?, ?)}";
-
-        try (Connection connection = ConexionOracle.getConn()) {
-            try (CallableStatement stmt = connection.prepareCall(sql)) {
-                stmt.setString(1, cedula);
-                stmt.setString(2, nombre);
-                stmt.setString(3, apellido);
-                stmt.setString(4, direccion);
-                stmt.setString(5, correo);
-                stmt.setString(6, contrasena);
-                stmt.setString(7, parentAffiliateId);
-                stmt.setBoolean(8, true); // Activar cuenta automáticamente
-
-                stmt.executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al obtener El Descuento del empleado",e);
-        }
-    }
 }

@@ -1,10 +1,6 @@
 package edu.uniquindio.redmultinivel.redmultinivel.controller;
 
 import java.io.IOException;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.*;
 
 import edu.uniquindio.redmultinivel.redmultinivel.App;
@@ -39,13 +35,13 @@ public class MainController {
     private ProductoCarritoDto productoDtoSeleccionado;
 
     @FXML
-    private TextField textFieldAffiliateId;
-
-    @FXML
     private TextField textFieldFirstName;
 
     @FXML
     private TextField textFieldLastName;
+
+    @FXML
+    private TextField textFieldCedula;
 
     @FXML
     private TextField textFieldEmail;
@@ -55,12 +51,6 @@ public class MainController {
 
     @FXML
     private TextField textFieldAddress;
-
-    @FXML
-    private TextField textFieldHierarchicalLevel;
-
-    @FXML
-    private TextField textFieldParentAffiliateId;
 
     @FXML
     private TextField textDescountValue;
@@ -440,51 +430,57 @@ public class MainController {
 
     @FXML
     private void agregarAfiliado() {
-        // Capturar los valores ingresados
-        String affiliateId = textFieldAffiliateId.getText();
-        String firstName = textFieldFirstName.getText();
-        String lastName = textFieldLastName.getText();
-        String email = textFieldEmail.getText();
-        String address = textFieldAddress.getText();
-        String contrasenia = textFieldContrasenia.getText();
 
-        System.out.println("aca va el llamado para crear el afiliado");
-    }
+        if(validarCamposLlenosParaRegistro()){
+            Long cedula = Long.parseLong(textFieldCedula.getText());
+            String firstName = textFieldFirstName.getText();
+            String lastName = textFieldLastName.getText();
+            String correo = textFieldEmail.getText();
+            String contrasenia = textFieldContrasenia.getText();
+            String address = textFieldAddress.getText();
+            Long afid = (long) affiliateId;
 
-/////////////////////////////
-@FXML
-private TextField txtAffiliateId;
+            int respuesta = AfiliadoData.registrarAfiliado(
+                    cedula,
+                    firstName,
+                    lastName,
+                    correo,
+                    contrasenia,
+                    1,
+                    address,
+                    1,
+                    afid
+            );
 
-    // Método para eliminar un afiliado al presionar el botón
-    @FXML
-    public void eliminarAfiliado() {
-        String affiliateId = txtAffiliateId.getText();
-
-        if (affiliateId == null || affiliateId.trim().isEmpty()) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", "Debe ingresar un ID válido.");
-            return;
+            mostrarDialogoInformacionSEncabezado("El usuario se ha añadido a tu equipo");
+            vaciarCamposRegistroAfiliado();
+        }else {
+            mostrarDialogoInformacionSEncabezado("Llene todos los campos antes de realizar la acción");
         }
 
-        try (Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "felipe", "12345");
-             CallableStatement statement = connection.prepareCall("{CALL eliminar_affiliate(?)}")) {
-
-            // Pasar el ID del afiliado como parámetro al procedimiento
-            statement.setInt(1, Integer.parseInt(affiliateId));
-
-            // Ejecutar el procedimiento almacenado
-            statement.execute();
-
-            // Mostrar mensaje de éxito
-            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "El afiliado fue eliminado correctamente.");
-
-        } catch (SQLException e) {
-            // Manejar errores de SQL
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", "Ocurrió un error al intentar eliminar el afiliado: " + e.getMessage());
-        } catch (NumberFormatException e) {
-            // Manejar errores de formato
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", "El ID del afiliado debe ser un número.");
-        }
     }
+
+    private void vaciarCamposRegistroAfiliado() {
+
+        textFieldCedula.clear();
+        textFieldFirstName.clear();
+        textFieldLastName.clear();
+        textFieldEmail.clear();
+        textFieldContrasenia.clear();
+        textFieldAddress.clear();
+    }
+
+    public boolean validarCamposLlenosParaRegistro() {
+        return !(textFieldCedula.getText().isEmpty() ||
+                textFieldFirstName.getText().isEmpty() ||
+                textFieldLastName.getText().isEmpty() ||
+                textFieldEmail.getText().isEmpty() ||
+                textFieldAddress.getText().isEmpty() ||
+                textFieldContrasenia.getText().isEmpty() );
+    }
+
+
+
 
     // Método para mostrar alertas en pantalla
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {

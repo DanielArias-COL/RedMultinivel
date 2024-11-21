@@ -147,4 +147,40 @@ public class AfiliadoData {
             throw new RuntimeException("Se presento un error vaciando el registro", e);
         }
     }
+
+    public static int registrarAfiliado(Long cedula, String nombre, String apellido, String correo,
+                                        String contrasena, int activate, String direccion, int level, Long parentId)  {
+
+        int salida = 0;
+        String query = "{? = CALL REGISTRAR_AFILIADO(?,?,?,?,?,?,?,?,?)}";
+
+        try (Connection connection = ConexionOracle.getConn()) {
+            try (CallableStatement cstmt = connection.prepareCall(query)) {
+
+                //parametros de salida
+                cstmt.registerOutParameter(1, java.sql.Types.INTEGER);
+
+
+                cstmt.setLong(2, cedula);
+                cstmt.setString(3, nombre);
+                cstmt.setString(4, apellido);
+                cstmt.setString(5, correo);
+                cstmt.setString(6, contrasena);
+                cstmt.setInt(7, activate);
+                cstmt.setString(8, direccion);
+                cstmt.setInt(9, level);
+                cstmt.setObject(10, parentId, java.sql.Types.INTEGER); // Maneja null correctamente
+
+                //se ejecuta la consulta
+                cstmt.execute();
+
+                // Obtener el valor del parámetro de salida
+                salida = cstmt.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al afiliar al usuario", e);
+        }
+
+        return salida;
+    }
 }
