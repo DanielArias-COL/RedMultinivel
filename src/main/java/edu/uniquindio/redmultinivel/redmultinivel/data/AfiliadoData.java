@@ -13,7 +13,7 @@ public class AfiliadoData {
     public static int obtenerDescuentoPorId(int affiliateId)  {
 
         int salida=0;
-        String query = "{? = CALL CALCULAR_DESCUENTO_POR_AFFILIATEID(?)}";
+        String query = "{? = CALL CALCULAR_AFFILIATEID(?)}";
 
         try(Connection conn = ConexionOracle.getConn();
             CallableStatement cstmt = conn.prepareCall(query)){
